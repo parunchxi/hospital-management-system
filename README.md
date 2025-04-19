@@ -65,7 +65,7 @@ npm run dev
 
 This project is deployed using:
 
-- **Frontend + Backend**: [Vercel](https://ve rcel.com/)
+- **Frontend + Backend**: [Vercel](https://vercel.com/)
 - **Database & Auth**: [Supabase](https://supabase.com/)
 
 ## 📌 License
