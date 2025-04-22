@@ -6,10 +6,27 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export const signUpAction = async (formData: FormData) => {
+  const first_name = formData.get('first_name')?.toString()
+  const last_name = formData.get('last_name')?.toString()
+  const date_of_birth = formData.get('date_of_birth')?.toString()
+  const gender = formData.get('gender')?.toString()
+  const national_id = formData.get('national_id')
+  const address = formData.get('address')?.toString()
+  const phone_number = formData.get('phone_number')
+
   const email = formData.get('email')?.toString()
   const password = formData.get('password')?.toString()
+
   const supabase = await createClient()
   const origin = (await headers()).get('origin')
+
+  if (!first_name || !last_name || !date_of_birth || !gender || !national_id || !address || !phone_number || !email || !password) {
+    return encodedRedirect(
+      'error',
+      '/sign-up',
+      'All fields are required',
+    );
+  }
 
   if (!email || !password) {
     return encodedRedirect(
@@ -19,7 +36,7 @@ export const signUpAction = async (formData: FormData) => {
     )
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data: signupData, error: signupError } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -27,16 +44,44 @@ export const signUpAction = async (formData: FormData) => {
     },
   })
 
-  if (error) {
-    console.error(error.code + ' ' + error.message)
-    return encodedRedirect('error', '/sign-up', error.message)
-  } else {
-    return encodedRedirect(
-      'success',
-      '/sign-up',
-      'Thanks for signing up! Please check your email for a verification link.',
-    )
+  if (signupError) {
+    console.error(signupError.code + ' ' + signupError.message)
+    return encodedRedirect('error', '/sign-up', signupError.message)
   }
+  console.log('Signup data:', signupData)
+
+  const User = signupData.user
+
+  if (!User) {
+    console.error('Signup succeeded but user object is null')
+    return encodedRedirect('error', '/sign-up', 'Signup failed unexpectedly.')
+  }
+
+  const { error: insertError } = await supabase
+  .from('users')
+  .insert({
+    user_id: User.id,
+    national_id,
+    first_name,
+    last_name,
+    date_of_birth,
+    gender,
+    address,
+    phone_number,
+    })
+
+
+  if (insertError) {
+    console.error(insertError.code + ' ' + insertError.message)
+    return encodedRedirect('error', '/sign-up', 'User signup succeeded but saving profile failed.')
+  }
+
+  // Success
+  return encodedRedirect(
+    'success',
+    '/sign-up',
+    'Thanks for signing up! Please check your email for a verification link.',
+  )
 }
 
 export const signInAction = async (formData: FormData) => {
