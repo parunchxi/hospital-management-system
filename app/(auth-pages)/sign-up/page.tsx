@@ -4,23 +4,15 @@ import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { SmtpMessage } from '../smtp-message'
 
 export default async function Signup(props: {
   searchParams: Promise<Message>
 }) {
   const searchParams = await props.searchParams
-  if ('message' in searchParams) {
-    return (
-      <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-        <FormMessage message={searchParams} />
-      </div>
-    )
-  }
 
   return (
-    <>
-      <form className="flex flex-col min-w-64 max-w-md mx-auto">
+    <div className="w-full flex-1 flex items-center justify-center h-screen p-4">
+      <form className="flex flex-col min-w-64 w-full max-w-md">
         <h1 className="text-2xl font-medium mb-2">Sign up</h1>
         <p className="text-sm text-foreground mb-6">
           Already have an account?{' '}
@@ -30,7 +22,6 @@ export default async function Signup(props: {
         </p>
 
         <div className="flex flex-col gap-2 [&>input]:mb-3">
-
           <Label htmlFor="first_name">First Name</Label>
           <Input name="first_name" placeholder="First Name" required />
 
@@ -53,16 +44,35 @@ export default async function Signup(props: {
           </select>
 
           <Label htmlFor="national_id">National ID</Label>
-          <Input name="national_id" placeholder="1234567890123" type='number' minLength={13} maxLength={13} required />
+          <Input
+            name="national_id"
+            placeholder="1234567890123"
+            type="text"
+            minLength={13}
+            maxLength={13}
+            required
+          />
 
           <Label htmlFor="address">Address</Label>
           <Input name="address" placeholder="Your address" required />
 
           <Label htmlFor="phone_number">Phone Number</Label>
-          <Input name="phone_number" placeholder="0812345678" type='number' minLength={10} maxLength={10} required />
+          <Input
+            name="phone_number"
+            placeholder="0812345678"
+            type="text"
+            minLength={10}
+            maxLength={10}
+            required
+          />
 
           <Label htmlFor="email">Email</Label>
-          <Input type="email" name="email" placeholder="you@example.com" required />
+          <Input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
 
           <Label htmlFor="password">Password</Label>
           <Input
@@ -80,8 +90,6 @@ export default async function Signup(props: {
           <FormMessage message={searchParams} />
         </div>
       </form>
-
-      <SmtpMessage />
-    </>
+    </div>
   )
 }
