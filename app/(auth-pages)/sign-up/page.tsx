@@ -1,104 +1,219 @@
+'use client'
+
+import * as React from 'react'
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
+
 import { signUpAction } from '@/app/actions'
 import { FormMessage, Message } from '@/components/form-message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage as FieldMessage,
+} from '@/components/ui/form'
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
-export default async function Signup(props: {
+const SignupSchema = z.object({
+  date_of_birth: z.date({ required_error: 'Date of birth is required' }),
+  gender: z.string().min(1, 'Gender is required'),
+})
+
+export default function SignupWrapper(props: {
   searchParams: Promise<Message>
 }) {
-  const searchParams = await props.searchParams
+  const [message, setMessage] = React.useState<Message>()
+
+  React.useEffect(() => {
+    props.searchParams.then(setMessage)
+  }, [props.searchParams])
+
+  return <Signup message={message} />
+}
+
+function Signup({ message }: { message?: Message }) {
+  const form = useForm<z.infer<typeof SignupSchema>>({
+    resolver: zodResolver(SignupSchema),
+    defaultValues: {
+      gender: '',
+    },
+  })
+
+  const watchDate = form.watch('date_of_birth')
+  const watchGender = form.watch('gender')
 
   return (
-    <div className="w-full flex flex-col items-center justify-start p-4 min-h-screen">
-      <form className="flex flex-col min-w-64 w-full max-w-md">
-        <h1 className="text-2xl font-medium mb-2">Sign up</h1>
-        <p className="text-sm text-foreground mb-6">
-          Already have an account?{' '}
-          <Link className="text-primary font-medium underline" href="/sign-in">
-            Sign in
-          </Link>
-        </p>
+    <div className="w-full flex flex-col items-center justify-start min-h-screen">
+      <Form {...form}>
+        <form
+          action={signUpAction}
+          className="flex-1 flex flex-col min-w-64 w-full max-w-md"
+        >
+          <h1 className="text-2xl font-medium">Sign up</h1>
+          <p className="text-sm text-foreground">
+            Already have an account?{' '}
+            <Link
+              className="text-foreground font-medium underline"
+              href="/sign-in"
+            >
+              Sign in
+            </Link>
+          </p>
 
-        <div className="flex flex-col gap-2 [&>input]:mb-3">
-          <Label htmlFor="first_name">First Name</Label>
-          <Input name="first_name" placeholder="First Name" required />
+          <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input name="first_name" placeholder="First Name" required />
 
-          <Label htmlFor="last_name">Last Name</Label>
-          <Input name="last_name" placeholder="Last Name" required />
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input name="last_name" placeholder="Last Name" required />
 
-          <Label htmlFor="date_of_birth">Date of Birth</Label>
-          <Input type="date" name="date_of_birth" required />
+            <FormField
+              control={form.control}
+              name="date_of_birth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'w-full text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value
+                            ? format(field.value, 'PPP')
+                            : 'Pick a date'}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date('1900-01-01')
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FieldMessage />
+                </FormItem>
+              )}
+            />
 
-          <Label htmlFor="gender">Gender</Label>
-          <select
-            name="gender"
-            required
-            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldMessage />
+                </FormItem>
+              )}
+            />
 
-          <Label htmlFor="national_id">National ID</Label>
-          <Input
-            name="national_id"
-            placeholder="1234567890123"
-            type="text"
-            minLength={13}
-            maxLength={13}
-            required
-          />
+            <input
+              type="hidden"
+              name="date_of_birth"
+              value={watchDate ? format(watchDate, 'yyyy-MM-dd') : ''}
+            />
+            <input type="hidden" name="gender" value={watchGender} />
 
-          <Label htmlFor="address">Address</Label>
-          <Input name="address" placeholder="Your address" required />
+            <Label htmlFor="national_id">National ID</Label>
+            <Input
+              name="national_id"
+              placeholder="1234567890123"
+              type="text"
+              minLength={13}
+              maxLength={13}
+              required
+            />
 
-          <Label htmlFor="phone_number">Phone Number</Label>
-          <Input
-            name="phone_number"
-            placeholder="0812345678"
-            type="text"
-            minLength={10}
-            maxLength={10}
-            required
-          />
+            <Label htmlFor="address">Address</Label>
+            <Input name="address" placeholder="Your address" required />
 
-          <Label htmlFor="email">Email</Label>
-          <Input
-            type="email"
-            name="email"
-            placeholder="you@example.com"
-            required
-          />
+            <Label htmlFor="phone_number">Phone Number</Label>
+            <Input
+              name="phone_number"
+              placeholder="0812345678"
+              type="text"
+              minLength={10}
+              maxLength={10}
+              required
+            />
 
-          <Label htmlFor="password">Password</Label>
-          <Input
-            type="password"
-            name="password"
-            placeholder="Your password"
-            minLength={6}
-            required
-          />
+            <Label htmlFor="email">Email</Label>
+            <Input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+            />
 
-          <Label htmlFor="confirm_password">Confirm Password</Label>
-          <Input
-            type="password"
-            name="confirm_password"
-            placeholder="Confirm your password"
-            minLength={6}
-            required
-          />
+            <Label htmlFor="password">Password</Label>
+            <Input
+              type="password"
+              name="password"
+              placeholder="Your password"
+              minLength={6}
+              required
+            />
 
-          <SubmitButton formAction={signUpAction} pendingText="Signing up...">
-            Sign up
-          </SubmitButton>
+            <Label htmlFor="confirm_password">Confirm Password</Label>
+            <Input
+              type="password"
+              name="confirm_password"
+              placeholder="Confirm your password"
+              minLength={6}
+              required
+            />
 
-          <FormMessage message={searchParams} />
-        </div>
-      </form>
+            <SubmitButton pendingText="Signing up...">Sign up</SubmitButton>
+            {message && <FormMessage message={message} />}
+          </div>
+        </form>
+      </Form>
     </div>
   )
 }
