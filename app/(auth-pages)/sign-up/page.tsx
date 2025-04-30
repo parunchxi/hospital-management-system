@@ -11,7 +11,7 @@ export default async function Signup(props: {
   const searchParams = await props.searchParams
 
   return (
-    <div className="w-full flex-1 flex items-center justify-center h-screen p-4">
+    <div className="w-full flex flex-col items-center justify-start p-4 min-h-screen">
       <form className="flex flex-col min-w-64 w-full max-w-md">
         <h1 className="text-2xl font-medium mb-2">Sign up</h1>
         <p className="text-sm text-foreground mb-6">
@@ -79,6 +79,15 @@ export default async function Signup(props: {
             type="password"
             name="password"
             placeholder="Your password"
+            minLength={6}
+            required
+          />
+
+          <Label htmlFor="confirm_password">Confirm Password</Label>
+          <Input
+            type="password"
+            name="confirm_password"
+            placeholder="Confirm your password"
             minLength={6}
             required
           />
