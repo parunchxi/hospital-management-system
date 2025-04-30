@@ -34,8 +34,12 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <header className="border-b bg-card text-card-foreground shadow-sm">
               <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <Link href="/" className="text-lg font-semibold">
-                  🏥 HMS
+                <Link
+                  href="/"
+                  className="flex items-center gap-1 text-xl font-semibold"
+                >
+                  <img src="/HMSLogo.svg" alt="Logo" className="h-7 w-7" />
+                  HMS
                 </Link>
                 <div className="flex items-center gap-4">
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
