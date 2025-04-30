@@ -47,9 +47,7 @@ export default function RootLayout({
               </div>
             </header>
 
-            <main className="flex-1 container mx-auto px-4 py-6">
-              {children}
-            </main>
+            <main className="flex-1 container mx-auto">{children}</main>
 
             <footer className="border-t border-border text-muted-foreground text-xs text-center py-6">
               <div className="container mx-auto flex h-4 items-center justify-between px-4">
