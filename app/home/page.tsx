@@ -18,7 +18,7 @@ export default async function HomePage() {
       <div>
         <h1 className="text-3xl font-bold">Welcome 👋</h1>
         <p className="text-muted-foreground mt-2">
-          You're now signed in as{' '}
+          You&#39;re now signed in as{' '}
           <span className="font-medium">{user.email}</span>
         </p>
       </div>
