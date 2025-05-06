@@ -5,8 +5,12 @@ import { NextRequest, NextResponse } from 'next/server'
 const validStaffTypes = ['Doctor', 'Nurse', 'Pharmacist', 'Admin']
 const validEmploymentStatus = ['Active', 'On_Leave', 'Resigned', 'Retired']
 
-export async function PATCH(req: NextRequest, res: NextResponse) {
-  const id = req.nextUrl.pathname.split('/').pop();  
+export async function PATCH(
+  req: NextRequest,
+  { params }: {params: Promise<{ id: string }>}
+) {
+  const { id } = await params;
+  // const id = params.id;
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 })
   }
