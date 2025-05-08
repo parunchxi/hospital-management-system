@@ -209,6 +209,33 @@ function Signup({ message }: { message?: Message }) {
               required
             />
 
+            <Label htmlFor="blood_type">Blood Type</Label>
+            <Select name="blood_type" required>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Blood Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A+">A+</SelectItem>
+                <SelectItem value="A-">A-</SelectItem>
+                <SelectItem value="B+">B+</SelectItem>
+                <SelectItem value="B-">B-</SelectItem>
+                <SelectItem value="AB+">AB+</SelectItem>
+                <SelectItem value="AB-">AB-</SelectItem>
+                <SelectItem value="O+">O+</SelectItem>
+                <SelectItem value="O-">O-</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Label htmlFor="emergency_contact">Emergency Contact</Label>
+            <Input
+              name="emergency_contact"
+              placeholder="0812345678"
+              type="text"
+              minLength={10}
+              maxLength={10}
+              required
+            />
+
             <SubmitButton pendingText="Signing up...">Sign up</SubmitButton>
             {message && <FormMessage message={message} />}
           </div>
