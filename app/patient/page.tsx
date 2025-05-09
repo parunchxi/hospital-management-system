@@ -24,29 +24,36 @@ export default function PatientDashboard() {
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null)
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchPatientProfile = async () => {
-      const response = await fetch('/api/patients/me')
-      if (!response.ok) {
-        throw new Error('Failed to fetch patient profile')
+    const fetchData = async () => {
+      try {
+        const [patientResponse, appointmentsResponse] = await Promise.all([
+          fetch('/api/patients/me'),
+          fetch('/api/appointments'),
+        ])
+
+        if (!patientResponse.ok) {
+          throw new Error('Failed to fetch patient profile')
+        }
+        if (!appointmentsResponse.ok) {
+          throw new Error('Failed to fetch appointments')
+        }
+
+        const patientData = await patientResponse.json()
+        const appointmentsData = await appointmentsResponse.json()
+
+        setPatientProfile(patientData)
+        setAppointments(appointmentsData)
+      } catch (err) {
+        setError('An error occurred while fetching data')
+      } finally {
+        setLoading(false)
       }
-      const data = await response.json()
-      setPatientProfile(data)
     }
-  
-    const fetchAppointments = async () => {
-      const response = await fetch('/api/appointments')
-      if (!response.ok) {
-        throw new Error('Failed to fetch appointments')
-      }
-      const data = await response.json()
-      setAppointments(data)
-    }
-  
-    fetchPatientProfile()
-    fetchAppointments()
+
+    fetchData()
   }, [])
 
   if (loading) return <div>Loading...</div>
