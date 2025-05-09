@@ -20,7 +20,6 @@ export async function PATCH(
     staff_type,
     license_number,
     employment_status,
-    updated_at,
   } = await req.json()
 
   const result = await getUserRole()
@@ -38,8 +37,7 @@ export async function PATCH(
     !department_id &&
     !staff_type &&
     !license_number &&
-    !employment_status &&
-    !updated_at
+    !employment_status 
   ) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
   }
@@ -84,7 +82,7 @@ export async function PATCH(
   }
 
   if (license_number !== undefined) updateData.license_number = license_number
-  if (updated_at !== undefined) updateData.updated_at = updated_at
+  updateData.updated_at = new Date().toISOString()
 
   const { data, error } = await supabase
     .from('medical_staff')
