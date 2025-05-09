@@ -38,33 +38,31 @@ export default function UpcomingAppointmentsTable({
         <CardTitle>Upcoming Appointments</CardTitle>
         <CardDescription>Your confirmed doctor visits</CardDescription>
       </CardHeader>
-      <CardContent className="pl-2">
-        <div className="overflow-x-auto rounded-xl border border-border bg-muted/40 px-6 py-5">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Doctor</TableHead>
-                <TableHead>Status</TableHead>
+      <CardContent className="pl-2px-6 py-4 overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Doctor</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {appointments.map((appt, i) => (
+              <TableRow key={i} className="text-sm [&>td]:py-3">
+                <TableCell className="font-medium">{appt.date}</TableCell>
+                <TableCell>{appt.time}</TableCell>
+                <TableCell>{appt.doctor}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusVariant(appt.status)}>
+                    {appt.status}
+                  </Badge>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {appointments.map((appt, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{appt.date}</TableCell>
-                  <TableCell>{appt.time}</TableCell>
-                  <TableCell>{appt.doctor}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(appt.status)}>
-                      {appt.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )
