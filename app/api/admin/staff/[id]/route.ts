@@ -16,6 +16,9 @@ export async function PATCH(
   }
 
   const { department_id, staff_type, license_number, employment_status, updated_at } = await req.json()
+  
+  const result = await getUserRole()
+  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const result = await getUserRole()
   if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

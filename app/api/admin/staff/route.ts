@@ -13,6 +13,7 @@ export async function GET(req: Request) {
 
   const { role, userId } = result
 
+  const { role, userId } = result
   if (role !== 'Admin') {
     return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
   }
@@ -42,6 +43,8 @@ export async function GET(req: Request) {
 // POST /api/admin/staff → Create staff 
 export async function POST(req: Request) {
   const { user_id, department_id, staff_type, license_number, employment_status, date_hired, updated_at} = await req.json()
+  const result = await getUserRole()
+  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const result = await getUserRole()
   if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
