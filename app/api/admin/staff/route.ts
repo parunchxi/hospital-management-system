@@ -133,7 +133,7 @@ export async function POST(req: Request) {
         license_number,
         employment_status,
         date_hired,
-        updated_at,
+        updated_at: new Date().toISOString(),
       },
     ])
     .single()
