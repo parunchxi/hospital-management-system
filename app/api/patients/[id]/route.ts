@@ -5,7 +5,8 @@ import { use } from 'react';
 
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
+
 ) {
     const supabase = await createClient();
     const result = await getUserRole();
@@ -15,7 +16,7 @@ export async function GET(
     }
 
     const { role, userId } = result;
-    const patientId = params.id;
+    const { id: patientId } = await params;
 
     const { data: patient, error } = await supabase
         .from('patients')
