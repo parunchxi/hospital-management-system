@@ -58,13 +58,17 @@ export default function PatientDashboard() {
               </div>
             </div>
           </section>
+
           {/* Appointment Tile */}
           <section className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <CalendarIcon className="w-5 h-5" /> Appointment
             </h2>
-            <Calendar />
+            <div className="overflow-hidden max-w-[300px] mx-auto">
+              <Calendar />
+            </div>
           </section>
+
           {/* Upcoming Appointments Tile */}
           <section className="bg-white rounded-lg shadow p-6 md:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
@@ -103,6 +107,7 @@ export default function PatientDashboard() {
               </table>
             </div>
           </section>
+
           {/* Billing Tile */}
           <section className="bg-blue-50 rounded-lg shadow p-6 md:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Billing</h2>
