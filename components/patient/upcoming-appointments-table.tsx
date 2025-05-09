@@ -19,18 +19,35 @@ import { Badge } from '@/components/ui/badge'
 
 interface Appointment {
   date: string
-  time: string
   doctor: string
-  status: 'Paid' | 'Pending'
+  status: 'Scheduled' | 'Completed' | 'Canceled'
 }
 
 export default function UpcomingAppointmentsTable({
   appointments,
 }: {
-  appointments: Appointment[]
+  appointments: {
+    visit_date: string
+    visit_status: 'Scheduled' | 'Completed' | 'Canceled'
+    medical_staff: {
+      users: {
+        last_name: string
+        first_name: string
+      }
+    }
+  }[]
 }) {
-  const getStatusVariant = (status: 'Paid' | 'Pending') =>
-    status === 'Paid' ? 'default' : 'destructive'
+  const getStatusVariant = (status: 'Scheduled' | 'Completed' | 'Canceled') => {
+    switch (status) {
+      case 'Completed':
+        return 'default'
+      case 'Canceled':
+        return 'destructive'
+      case 'Scheduled':
+      default:
+        return 'secondary'
+    }
+  }
 
   return (
     <Card className="lg:col-span-2 order-1 lg:order-none">
@@ -43,7 +60,6 @@ export default function UpcomingAppointmentsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Time</TableHead>
               <TableHead>Doctor</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -51,12 +67,14 @@ export default function UpcomingAppointmentsTable({
           <TableBody>
             {appointments.map((appt, i) => (
               <TableRow key={i} className="text-sm [&>td]:py-3">
-                <TableCell className="font-medium">{appt.date}</TableCell>
-                <TableCell>{appt.time}</TableCell>
-                <TableCell>{appt.doctor}</TableCell>
+                <TableCell className="font-medium">{appt.visit_date}</TableCell>
                 <TableCell>
-                  <Badge variant={getStatusVariant(appt.status)}>
-                    {appt.status}
+                  {appt.medical_staff.users.first_name}{' '}
+                  {appt.medical_staff.users.last_name}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStatusVariant(appt.visit_status)}>
+                    {appt.visit_status}
                   </Badge>
                 </TableCell>
               </TableRow>
