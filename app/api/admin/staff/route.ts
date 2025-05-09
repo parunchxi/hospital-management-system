@@ -59,10 +59,6 @@ export async function POST(req: Request) {
   if (!result)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const result = await getUserRole()
-  if (!result)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const { role, userId } = result
   if (role !== 'Admin')
     return NextResponse.json(
