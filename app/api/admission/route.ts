@@ -3,6 +3,16 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { getUserRole } from '@/utils/getRoles'
 
+// example request body
+// { 
+//   "patient_id": 3,
+//   "room_id": 10,
+//   "nurse_id": 10,
+//   "admission_date": "2025-05-10",
+//   "discharge_date": "2025-05-20",
+// }
+
+
 // POST /api/admissions → Admit patient (Doctor or Admin)
 export async function POST(req: Request) {
   const {
@@ -11,8 +21,6 @@ export async function POST(req: Request) {
     nurse_id,
     admission_date,
     discharge_date,
-    reason_for_admission,
-    admission_status,
   } = await req.json()
 
   const supabase = await createClient()
@@ -55,8 +63,7 @@ export async function POST(req: Request) {
     !patient_id ||
     !room_id ||
     !nurse_id ||
-    !admission_date ||
-    !admission_status
+    !admission_date 
   ) {
     return NextResponse.json(
       { error: 'Missing required fields' },
@@ -112,9 +119,7 @@ export async function POST(req: Request) {
         doctor_id: doctor.staff_id,
         admission_date,
         discharge_date: discharge_date || null,
-        reason_for_admission: reason_for_admission || null,
-        admission_status,
-        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       },
     ])
     .single()
