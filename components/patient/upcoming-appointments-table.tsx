@@ -50,7 +50,7 @@ export default function UpcomingAppointmentsTable({
   }
 
   return (
-    <Card className="lg:col-span-2 order-1 lg:order-none">
+    <Card className="sm:col-span-2 order-1 lg:order-none">
       <CardHeader>
         <CardTitle>Upcoming Appointments</CardTitle>
         <CardDescription>Your confirmed doctor visits</CardDescription>
