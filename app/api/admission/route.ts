@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     admission_date,
     discharge_date,
     reason_for_admission,
-    admission_status
+    admission_status,
   } = await req.json()
 
   const supabase = await createClient()
@@ -24,7 +24,10 @@ export async function POST(req: Request) {
   const { role, userId } = result
 
   if (role !== 'Admin' && role !== 'Doctor') {
-    return NextResponse.json({ error: 'Forbidden: Only admins or doctors can assign nurses' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: Only admins or doctors can assign nurses' },
+      { status: 403 },
+    )
   }
   // Get doctor info
   const { data: doctor, error: doctorError } = await supabase
@@ -34,16 +37,31 @@ export async function POST(req: Request) {
     .single()
 
   if (doctorError || !doctor) {
-    return NextResponse.json({ error: 'Forbidden: You are not a medical staff' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: You are not a medical staff' },
+      { status: 403 },
+    )
   }
 
   if (role !== 'Doctor' && role !== 'Admin') {
-    return NextResponse.json({ error: 'Forbidden: Only doctors or admins can admit patients' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: Only doctors or admins can admit patients' },
+      { status: 403 },
+    )
   }
 
   // Validate required fields
-  if (!patient_id || !room_id || !nurse_id || !admission_date || !admission_status) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  if (
+    !patient_id ||
+    !room_id ||
+    !nurse_id ||
+    !admission_date ||
+    !admission_status
+  ) {
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    )
   }
 
   // Validate patient exists
@@ -77,7 +95,10 @@ export async function POST(req: Request) {
     .single()
 
   if (nurseError || !nurse) {
-    return NextResponse.json({ error: 'Invalid nurse_id or staff is not a Nurse' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Invalid nurse_id or staff is not a Nurse' },
+      { status: 400 },
+    )
   }
 
   // Insert into admissions table
@@ -94,13 +115,16 @@ export async function POST(req: Request) {
         reason_for_admission: reason_for_admission || null,
         admission_status,
         created_at: new Date().toISOString(),
-      }
+      },
     ])
     .single()
 
   if (error) {
     console.error('Admit patient error:', error)
-    return NextResponse.json({ error: 'Failed to admit patient' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to admit patient' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json(data, { status: 201 })

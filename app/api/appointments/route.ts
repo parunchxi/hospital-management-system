@@ -9,34 +9,42 @@ const validPatientStatuses = ['Outpatient', 'Inpatient']
 
 // GET /api/appointments → List all appointments (Doctor only)
 export async function GET(req: Request) {
-    const supabase = await createClient()
-    const result = await getUserRole()
+  const supabase = await createClient()
+  const result = await getUserRole()
 
+  if (!result) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-    if (!result) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }    
-    
-    const { role, userId } = result
+  const { role, userId } = result
 
-    const { data: doctor, error: doctorError } = await supabase
-        .from('medical_staff')
-        .select('staff_id, staff_type')
-        .eq('user_id', userId)
-        .single()
-    
-    if (doctorError || !doctor) {
-        return NextResponse.json({ error: 'Forbidden: You are not a medical staff' }, { status: 403 })
-    }
-    
-    if (doctor.staff_type !== 'Doctor' && doctor.staff_type !== 'Admin') {
-        return NextResponse.json({ error: `Forbidden: Only doctors can view appointments. Your role: ${doctor.staff_type}` }, { status: 403 })
-    }
-    
-    // Fetch appointments for the authenticated doctor
-    const { data, error } = await supabase
-        .from('medical_records')
-        .select(`
+  const { data: doctor, error: doctorError } = await supabase
+    .from('medical_staff')
+    .select('staff_id, staff_type')
+    .eq('user_id', userId)
+    .single()
+
+  if (doctorError || !doctor) {
+    return NextResponse.json(
+      { error: 'Forbidden: You are not a medical staff' },
+      { status: 403 },
+    )
+  }
+
+  if (doctor.staff_type !== 'Doctor' && doctor.staff_type !== 'Admin') {
+    return NextResponse.json(
+      {
+        error: `Forbidden: Only doctors can view appointments. Your role: ${doctor.staff_type}`,
+      },
+      { status: 403 },
+    )
+  }
+
+  // Fetch appointments for the authenticated doctor
+  const { data, error } = await supabase
+    .from('medical_records')
+    .select(
+      `
         record_id,
         symptoms,
         patient_status,
@@ -48,18 +56,22 @@ export async function GET(req: Request) {
                 last_name
             )
         )
-        `)
-        .eq('doctor_id', doctor.staff_id)
-        .eq('visit_status', 'Scheduled')
-        .order('visit_date', { ascending: false })
-    
-    if (error) {
-        console.error('Fetch appointments error:', error)
-        return NextResponse.json({ error: 'Failed to fetch appointments' }, { status: 500 })
-    }
-    
-    return NextResponse.json(data)
-    } 
+        `,
+    )
+    .eq('doctor_id', doctor.staff_id)
+    .eq('visit_status', 'Scheduled')
+    .order('visit_date', { ascending: false })
+
+  if (error) {
+    console.error('Fetch appointments error:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch appointments' },
+      { status: 500 },
+    )
+  }
+
+  return NextResponse.json(data)
+}
 
 // POST /api/appointments → Create appointment (Doctor only)
 export async function POST(req: Request) {
@@ -71,7 +83,7 @@ export async function POST(req: Request) {
     medicine_prescribed,
     visit_date,
     visit_status,
-    patient_status
+    patient_status,
   } = await req.json()
 
   const supabase = await createClient()
@@ -88,16 +100,27 @@ export async function POST(req: Request) {
     .single()
 
   if (doctorError || !doctor) {
-    return NextResponse.json({ error: 'Forbidden: You are not a medical staff' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: You are not a medical staff' },
+      { status: 403 },
+    )
   }
 
   if (doctor.staff_type !== 'Doctor' && doctor.staff_type !== 'Admin') {
-    return NextResponse.json({ error: `Forbidden: Only doctors can create appointments. Your role: ${doctor.staff_type}` }, { status: 403 })
+    return NextResponse.json(
+      {
+        error: `Forbidden: Only doctors can create appointments. Your role: ${doctor.staff_type}`,
+      },
+      { status: 403 },
+    )
   }
 
   // Validate required fields
   if (!patient_id || !visit_date || !visit_status || !patient_status) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    )
   }
 
   // Validate ENUMs
@@ -106,7 +129,10 @@ export async function POST(req: Request) {
   }
 
   if (!validPatientStatuses.includes(patient_status)) {
-    return NextResponse.json({ error: 'Invalid patient_status' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Invalid patient_status' },
+      { status: 400 },
+    )
   }
 
   // Validate patient exists
@@ -123,7 +149,8 @@ export async function POST(req: Request) {
   // Insert into medical_records
   const { data, error } = await supabase
     .from('medical_records')
-    .insert([{
+    .insert([
+      {
         patient_id,
         doctor_id: doctor.staff_id,
         symptoms: symptoms || null,
@@ -134,12 +161,16 @@ export async function POST(req: Request) {
         visit_status,
         patient_status,
         created_at: new Date().toISOString(),
-      }])
+      },
+    ])
     .single()
 
   if (error) {
     console.error('Create appointment error:', error)
-    return NextResponse.json({ error: 'Failed to create appointment' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to create appointment' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json(data, { status: 201 })

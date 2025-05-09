@@ -10,7 +10,7 @@ export async function getUserRole(): Promise<UserRoleResult | null> {
 
   const {
     data: { user },
-    error: userError
+    error: userError,
   } = await supabase.auth.getUser()
 
   if (userError || !user) {
@@ -35,6 +35,6 @@ export async function getUserRole(): Promise<UserRoleResult | null> {
 
   return {
     role: staffData?.staff_type || 'Patient',
-    userId: user.id
+    userId: user.id,
   }
 }

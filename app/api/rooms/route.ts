@@ -22,7 +22,10 @@ export async function GET(req: Request) {
   const { role, userId } = result
 
   if (role !== 'Admin' && role !== 'Doctor') {
-    return NextResponse.json({ error: 'Forbidden: Only admins or doctors can view rooms' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: Only admins or doctors can view rooms' },
+      { status: 403 },
+    )
   }
   const { data: staff, error: staffError } = await supabase
     .from('medical_staff')
@@ -31,13 +34,19 @@ export async function GET(req: Request) {
     .single()
 
   if (staffError || !staff) {
-    return NextResponse.json({ error: 'Forbidden: You are not medical staff' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: You are not medical staff' },
+      { status: 403 },
+    )
   }
 
   if (staff.staff_type !== 'Doctor' && staff.staff_type !== 'Admin') {
-    return NextResponse.json({
-      error: `Forbidden: Only Doctors and Admins can view rooms. Your role: ${staff.staff_type}`,
-    }, { status: 403 })
+    return NextResponse.json(
+      {
+        error: `Forbidden: Only Doctors and Admins can view rooms. Your role: ${staff.staff_type}`,
+      },
+      { status: 403 },
+    )
   }
 
   const { searchParams } = new URL(req.url)
@@ -47,10 +56,12 @@ export async function GET(req: Request) {
 
   let query = supabase
     .from('rooms')
-    .select(`
+    .select(
+      `
       room_id, room_type, department_id, price_per_night, capacity,
       departments(name)
-    `)
+    `,
+    )
     .order('room_id')
 
   if (type) query = query.eq('room_type', type)

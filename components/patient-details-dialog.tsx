@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React from 'react'
 import {
@@ -6,14 +6,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
 } from '@/components/ui/dialog'
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent
-} from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 interface Patient {
   id: string
@@ -41,7 +36,7 @@ interface PatientDetailsDialogProps {
 export function PatientDetailsDialog({
   open,
   onOpenChange,
-  patient
+  patient,
 }: PatientDetailsDialogProps) {
   if (!patient) return null
 
@@ -91,17 +86,23 @@ export function PatientDetailsDialog({
 
               <div className="space-y-2">
                 <h3 className="font-medium">Blood Type</h3>
-                <p className="text-sm">{patient.bloodType || 'Not available'}</p>
+                <p className="text-sm">
+                  {patient.bloodType || 'Not available'}
+                </p>
               </div>
 
               <div className="space-y-2">
                 <h3 className="font-medium">Contact Number</h3>
-                <p className="text-sm">{patient.contactNumber || 'Not available'}</p>
+                <p className="text-sm">
+                  {patient.contactNumber || 'Not available'}
+                </p>
               </div>
 
               <div className="space-y-2">
                 <h3 className="font-medium">Email Address</h3>
-                <p className="text-sm">{patient.emailAddress || 'Not available'}</p>
+                <p className="text-sm">
+                  {patient.emailAddress || 'Not available'}
+                </p>
               </div>
 
               <div className="space-y-2 col-span-2">
@@ -124,7 +125,8 @@ export function PatientDetailsDialog({
             <div className="border rounded-md p-4 bg-muted/30">
               <h3 className="font-medium mb-2">Medical History</h3>
               <p className="text-sm text-muted-foreground">
-                Medical records information will be displayed here. This information is not yet available.
+                Medical records information will be displayed here. This
+                information is not yet available.
               </p>
             </div>
           </TabsContent>
