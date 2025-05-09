@@ -17,8 +17,10 @@ export async function PATCH(
 
   const { department_id, staff_type, license_number, employment_status, updated_at } = await req.json()
 
-  const role = await getUserRole()
-  if (!role) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const result = await getUserRole()
+  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { role, userId } = result
   if (role !== 'Admin') return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
 
   if (!department_id && !staff_type && !license_number && !employment_status && !updated_at) {

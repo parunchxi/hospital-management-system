@@ -1,8 +1,13 @@
 import { createClient } from '@/utils/supabase/server'
 
-export async function getUserRole() {
+type UserRoleResult = {
+  role: string
+  userId: string
+}
+
+export async function getUserRole(): Promise<UserRoleResult | null> {
   const supabase = await createClient()
-  
+
   const {
     data: { user },
     error: userError
@@ -22,11 +27,14 @@ export async function getUserRole() {
   if (staffError) {
     if (staffError.code === 'PGRST116') {
       // No matching staff: probably a patient
-      return 'Patient'
+      return { role: 'Patient', userId: user.id }
     }
     console.error('Error checking role:', staffError)
     return null
   }
 
-  return staffData?.staff_type || 'Patient'
+  return {
+    role: staffData?.staff_type || 'Patient',
+    userId: user.id
+  }
 }
