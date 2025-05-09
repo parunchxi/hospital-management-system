@@ -7,26 +7,40 @@ const validEmploymentStatus = ['Active', 'On_Leave', 'Resigned', 'Retired']
 
 export async function PATCH(
   req: NextRequest,
-  { params }: {params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
+  const { id } = await params
   // const id = params.id;
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 })
   }
 
-  const { department_id, staff_type, license_number, employment_status, updated_at } = await req.json()
-  
-  const result = await getUserRole()
-  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const {
+    department_id,
+    staff_type,
+    license_number,
+    employment_status,
+    updated_at,
+  } = await req.json()
 
   const result = await getUserRole()
-  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!result)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { role, userId } = result
-  if (role !== 'Admin') return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
+  if (role !== 'Admin')
+    return NextResponse.json(
+      { error: 'Forbidden: Admin only' },
+      { status: 403 },
+    )
 
-  if (!department_id && !staff_type && !license_number && !employment_status && !updated_at) {
+  if (
+    !department_id &&
+    !staff_type &&
+    !license_number &&
+    !employment_status &&
+    !updated_at
+  ) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
   }
 
@@ -42,7 +56,10 @@ export async function PATCH(
       .single()
 
     if (deptError || !dept) {
-      return NextResponse.json({ error: 'Invalid department_id' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Invalid department_id' },
+        { status: 400 },
+      )
     }
     updateData.department_id = department_id
   }
@@ -58,7 +75,10 @@ export async function PATCH(
   // ✅ Validate employment_status ENUM
   if (employment_status !== undefined) {
     if (!validEmploymentStatus.includes(employment_status)) {
-      return NextResponse.json({ error: 'Invalid employment_status' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Invalid employment_status' },
+        { status: 400 },
+      )
     }
     updateData.employment_status = employment_status
   }
@@ -74,7 +94,10 @@ export async function PATCH(
 
   if (error) {
     console.error('Update error:', error)
-    return NextResponse.json({ error: 'Failed to update staff info' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to update staff info' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json(data, { status: 200 })

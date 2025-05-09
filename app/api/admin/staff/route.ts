@@ -9,13 +9,15 @@ const validEmploymentStatus = ['Active', 'On_Leave', 'Resigned', 'Retired']
 // GET /api/admin/staff → List all staff by type
 export async function GET(req: Request) {
   const result = await getUserRole()
-  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { role, userId } = result
+  if (!result)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { role, userId } = result
   if (role !== 'Admin') {
-    return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: Admin only' },
+      { status: 403 },
+    )
   }
 
   const staffType = new URL(req.url).searchParams.get('type')
@@ -23,13 +25,15 @@ export async function GET(req: Request) {
 
   let query = supabase
     .from('medical_staff')
-    .select(`
+    .select(
+      `
       staff_id, staff_type, license_number, employment_status, date_hired, updated_at,
       departments(name),
       users: user_id (
         user_id, national_id, first_name, last_name, gender, phone_number
       )
-    `)
+    `,
+    )
     .order('staff_id')
 
   if (staffType) query = query.eq('staff_type', staffType)
@@ -40,20 +44,43 @@ export async function GET(req: Request) {
   return NextResponse.json(data)
 }
 
-// POST /api/admin/staff → Create staff 
+// POST /api/admin/staff → Create staff
 export async function POST(req: Request) {
-  const { user_id, department_id, staff_type, license_number, employment_status, date_hired, updated_at} = await req.json()
+  const {
+    user_id,
+    department_id,
+    staff_type,
+    license_number,
+    employment_status,
+    date_hired,
+    updated_at,
+  } = await req.json()
   const result = await getUserRole()
-  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!result)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const result = await getUserRole()
-  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!result)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { role, userId } = result
-  if (role !== 'Admin') return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
+  if (role !== 'Admin')
+    return NextResponse.json(
+      { error: 'Forbidden: Admin only' },
+      { status: 403 },
+    )
 
-  if (!department_id || !staff_type || !license_number || !employment_status || !updated_at) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  if (
+    !department_id ||
+    !staff_type ||
+    !license_number ||
+    !employment_status ||
+    !updated_at
+  ) {
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    )
   }
 
   const supabase = await createClient()
@@ -66,7 +93,10 @@ export async function POST(req: Request) {
     .single()
 
   if (userError || !user) {
-    return NextResponse.json({ error: 'Invalid user_id. User does not exist.' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Invalid user_id. User does not exist.' },
+      { status: 400 },
+    )
   }
 
   // Validate department_id exists
@@ -77,7 +107,10 @@ export async function POST(req: Request) {
     .single()
 
   if (deptError || !dept) {
-    return NextResponse.json({ error: 'Invalid department_id' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Invalid department_id' },
+      { status: 400 },
+    )
   }
 
   // Validate staff_type ENUM
@@ -87,7 +120,10 @@ export async function POST(req: Request) {
 
   // Validate employment_status ENUM
   if (!validEmploymentStatus.includes(employment_status)) {
-    return NextResponse.json({ error: 'Invalid employment_status' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Invalid employment_status' },
+      { status: 400 },
+    )
   }
 
   // Create new staff record
@@ -101,14 +137,17 @@ export async function POST(req: Request) {
         license_number,
         employment_status,
         date_hired,
-        updated_at
-      }
+        updated_at,
+      },
     ])
     .single()
 
   if (error) {
     console.error('Create staff error:', error)
-    return NextResponse.json({ error: 'Failed to create staff' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to create staff' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json(data, { status: 201 })
