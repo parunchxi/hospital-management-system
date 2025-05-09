@@ -1,15 +1,16 @@
-"use client";
-import React from "react";
-import { Home, Users, Pill, CreditCard, FileText, Search } from "lucide-react";
+'use client'
+import React from 'react'
+import Image from 'next/image'
+import { Home, Users, Pill, CreditCard, FileText, Search } from 'lucide-react'
 
 export default function AdminDashboard() {
   const sidebarLinks = [
-    { label: "Dashboard", icon: <Home className="w-5 h-5" /> },
-    { label: "Medical Personnel", icon: <Users className="w-5 h-5" /> },
-    { label: "Medication", icon: <Pill className="w-5 h-5" /> },
-    { label: "Billing", icon: <CreditCard className="w-5 h-5" /> },     
-    { label: "Report", icon: <FileText className="w-5 h-5" /> },
-  ];
+    { label: 'Dashboard', icon: <Home className="w-5 h-5" /> },
+    { label: 'Medical Personnel', icon: <Users className="w-5 h-5" /> },
+    { label: 'Medication', icon: <Pill className="w-5 h-5" /> },
+    { label: 'Billing', icon: <CreditCard className="w-5 h-5" /> },
+    { label: 'Report', icon: <FileText className="w-5 h-5" /> },
+  ]
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -45,11 +46,15 @@ export default function AdminDashboard() {
           </div>
           {/* User Profile */}
           <div className="flex items-center gap-3">
-            <img
-              src="/avatar.png"
-              alt="Admin Avatar"
-              className="w-10 h-10 rounded-full object-cover bg-gray-200"
-            />
+            <div className="w-10 h-10 relative">
+              <Image
+                src="/avatar.png"
+                alt="Admin Avatar"
+                fill
+                className="rounded-full object-cover bg-gray-200"
+                sizes="40px"
+              />
+            </div>
             <div>
               <p className="font-medium text-gray-700">John Doe</p>
               <p className="text-sm text-gray-500">Administrator</p>
@@ -68,9 +73,15 @@ export default function AdminDashboard() {
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="border-b">
-                        <th className="py-2 px-4 text-left font-medium">Patient Name</th>
-                        <th className="py-2 px-4 text-left font-medium">Date</th>
-                        <th className="py-2 px-4 text-left font-medium">Payment Status</th>
+                        <th className="py-2 px-4 text-left font-medium">
+                          Patient Name
+                        </th>
+                        <th className="py-2 px-4 text-left font-medium">
+                          Date
+                        </th>
+                        <th className="py-2 px-4 text-left font-medium">
+                          Payment Status
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -137,11 +148,15 @@ export default function AdminDashboard() {
               <section className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Doctor Status</h2>
                 <div className="flex items-center gap-4">
-                  <img
-                    src="/doctor-avatar.png"
-                    alt="Doctor Avatar"
-                    className="w-16 h-16 rounded-full object-cover bg-gray-200"
-                  />
+                  <div className="w-16 h-16 relative">
+                    <Image
+                      src="/doctor-avatar.png"
+                      alt="Doctor Avatar"
+                      fill
+                      className="rounded-full object-cover bg-gray-200"
+                      sizes="64px"
+                    />
+                  </div>
                   <div>
                     <p className="font-medium text-gray-700">Dr. John Doe</p>
                     <p className="text-sm text-gray-500">Cardiologist</p>
@@ -152,36 +167,56 @@ export default function AdminDashboard() {
 
               {/* Nurse Assignment Status */}
               <section className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Nurse Assignment Status</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Nurse Assignment Status
+                </h2>
                 <ul className="space-y-4">
                   <li className="flex items-center justify-between">
-                    <span className="font-medium text-gray-700">Nurse Jane Smith</span>
-                    <span className="text-sm text-gray-500">Assigned to Room 101</span>
+                    <span className="font-medium text-gray-700">
+                      Nurse Jane Smith
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Assigned to Room 101
+                    </span>
                   </li>
                   <li className="flex items-center justify-between">
-                    <span className="font-medium text-gray-700">Nurse Emily Clark</span>
+                    <span className="font-medium text-gray-700">
+                      Nurse Emily Clark
+                    </span>
                     <span className="text-sm text-gray-500">Available</span>
                   </li>
                   <li className="flex items-center justify-between">
-                    <span className="font-medium text-gray-700">Nurse Robert Lee</span>
-                    <span className="text-sm text-gray-500">Assigned to Room 102</span>
+                    <span className="font-medium text-gray-700">
+                      Nurse Robert Lee
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Assigned to Room 102
+                    </span>
                   </li>
                 </ul>
               </section>
             </div>
           </div>
 
-          {/* Billings for the Patient Section */}
-          <section className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Billings for the Patient</h2>
+          {/* Billings Section */}
+          <section className="bg-white rounded-lg shadow p-6 mt-10">
+            <h2 className="text-xl font-semibold mb-4">
+              Billings for the Patient
+            </h2>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b">
-                    <th className="py-2 px-4 text-left font-medium">Invoice ID</th>
-                    <th className="py-2 px-4 text-left font-medium">Patient Name</th>
+                    <th className="py-2 px-4 text-left font-medium">
+                      Invoice ID
+                    </th>
+                    <th className="py-2 px-4 text-left font-medium">
+                      Patient Name
+                    </th>
                     <th className="py-2 px-4 text-left font-medium">Amount</th>
-                    <th className="py-2 px-4 text-left font-medium">Payment Status</th>
+                    <th className="py-2 px-4 text-left font-medium">
+                      Payment Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,36 +249,43 @@ export default function AdminDashboard() {
           <section className="mt-10">
             <h2 className="text-2xl font-semibold mb-6">Reports</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Admissions Report */}
               <a
                 href="/reports/admissions"
                 className="bg-white rounded-lg shadow p-6 flex flex-col items-start hover:shadow-md transition"
               >
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Admissions</h3>
-                <p className="text-sm text-gray-500">Grouped by day, week, or month</p>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  Admissions
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Grouped by day, week, or month
+                </p>
               </a>
-
-              {/* Medicine Stock Status */}
               <a
                 href="/reports/medicine-out-of-stock"
                 className="bg-white rounded-lg shadow p-6 flex flex-col items-start hover:shadow-md transition"
               >
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Medicine Stock Status</h3>
-                <p className="text-sm text-gray-500">Track out-of-stock medicines</p>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  Medicine Stock Status
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Track out-of-stock medicines
+                </p>
               </a>
-
-              {/* Billing Status Summary */}
               <a
                 href="/reports/billing-status-summary"
                 className="bg-white rounded-lg shadow p-6 flex flex-col items-start hover:shadow-md transition"
               >
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Billing Status Summary</h3>
-                <p className="text-sm text-gray-500">Overview of billing statuses</p>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  Billing Status Summary
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Overview of billing statuses
+                </p>
               </a>
             </div>
           </section>
         </main>
       </div>
     </div>
-  );
+  )
 }
