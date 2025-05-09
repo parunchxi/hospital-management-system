@@ -171,6 +171,45 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Billings for the Patient Section */}
+          <section className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">Billings for the Patient</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left font-medium">Invoice ID</th>
+                    <th className="py-2 px-4 text-left font-medium">Patient Name</th>
+                    <th className="py-2 px-4 text-left font-medium">Amount</th>
+                    <th className="py-2 px-4 text-left font-medium">Payment Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="py-2 px-4">INV-001</td>
+                    <td className="py-2 px-4">Jane Smith</td>
+                    <td className="py-2 px-4">$120.00</td>
+                    <td className="py-2 px-4">
+                      <span className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
+                        Paid
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-4">INV-002</td>
+                    <td className="py-2 px-4">Robert Lee</td>
+                    <td className="py-2 px-4">$80.00</td>
+                    <td className="py-2 px-4">
+                      <span className="inline-block px-2 py-1 bg-red-100 text-red-700 rounded text-xs">
+                        Unpaid
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
           {/* Reporting Section */}
           <section className="mt-10">
             <h2 className="text-2xl font-semibold mb-6">Reports</h2>

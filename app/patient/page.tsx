@@ -3,36 +3,16 @@ import { Home, User, Calendar as LucideCalendar, CreditCard, Calendar as Calenda
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { useState, useEffect  } from "react";
 
-const sidebarItems = [
-  { label: "Dashboard", icon: <Home className="w-5 h-5 mr-2" /> },
-  { label: "Personal Info", icon: <User className="w-5 h-5 mr-2" /> },
-  { label: "Appointment", icon: <LucideCalendar className="w-5 h-5 mr-2" /> },
-  { label: "Billing", icon: <CreditCard className="w-5 h-5 mr-2" /> },
-];
 
 export default function PatientDashboard() {
+
   return (
+
+
+
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r p-6 flex flex-col">
-        <h2 className="text-2xl font-bold mb-8">Patient Portal</h2>
-        <nav className="flex flex-col gap-2">
-          {sidebarItems.map((item) => (
-            <Button
-              key={item.label}
-              variant="ghost"
-              className={cn(
-                "justify-start w-full text-base font-medium",
-                item.label === "Dashboard" && "bg-muted"
-              )}
-            >
-              {item.icon}
-              {item.label}
-            </Button>
-          ))}
-        </nav>
-      </aside>
       {/* Main Content */}
       <main className="flex-1 p-10">
         <h1 className="text-3xl font-semibold mb-4">Welcome to your Dashboard</h1>
