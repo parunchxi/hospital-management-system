@@ -64,7 +64,6 @@ export default function PatientDashboard() {
           Welcome, {patientProfile?.users?.first_name || 'John Doe'}
         </h1>
       </header>
-      <pre>{JSON.stringify(patientProfile, null, 2)}</pre>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <PatientInfoCard patientProfile={patientProfile} />
         <AppointmentCalendarCard />
