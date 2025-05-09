@@ -7,7 +7,7 @@ type UserRoleResult = {
 
 export async function getUserRole(): Promise<UserRoleResult | null> {
   const supabase = await createClient()
-  
+
   const {
     data: { user },
     error: userError
