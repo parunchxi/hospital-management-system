@@ -14,55 +14,51 @@ export default async function AuthButton() {
 
   if (!hasEnvVars) {
     return (
-      <>
-        <div className="flex gap-4 items-center">
-          <div>
-            <Badge
-              variant={'default'}
-              className="font-normal pointer-events-none"
-            >
-              Please update .env.local file with anon key and url
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              asChild
-              size="sm"
-              variant={'outline'}
-              disabled
-              className="opacity-75 cursor-none pointer-events-none"
-            >
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              variant={'default'}
-              disabled
-              className="opacity-75 cursor-none pointer-events-none"
-            >
-              <Link href="/sign-up">Sign up</Link>
-            </Button>
-          </div>
+      <div className="flex items-center justify-between gap-4">
+        <Badge variant="default" className="font-normal pointer-events-none">
+          Please update <code>.env.local</code> with your Supabase URL & anon
+          key
+        </Badge>
+
+        <div className="flex gap-2">
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            disabled
+            className="pointer-events-none"
+          >
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
+          <Button
+            asChild
+            variant="default"
+            size="sm"
+            disabled
+            className="pointer-events-none"
+          >
+            <Link href="/sign-up">Sign up</Link>
+          </Button>
         </div>
-      </>
+      </div>
     )
   }
+
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
+      <span className="text-sm text-muted-foreground">Hey, {user.email}!</span>
       <form action={signOutAction}>
-        <Button type="submit" variant={'outline'}>
+        <Button type="submit" variant="outline" size="sm">
           Sign out
         </Button>
       </form>
     </div>
   ) : (
     <div className="flex gap-2">
-      <Button asChild size="sm" variant={'outline'}>
+      <Button asChild variant="secondary" size="sm">
         <Link href="/sign-in">Sign in</Link>
       </Button>
-      <Button asChild size="sm" variant={'default'}>
+      <Button asChild variant="default" size="sm">
         <Link href="/sign-up">Sign up</Link>
       </Button>
     </div>
