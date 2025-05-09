@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!['Doctor', 'Pharmacist'].includes(userRole.role)) {
+  if (!['Doctor', 'Pharmacist','Admin'].includes(userRole.role)) {
     return NextResponse.json({ error: 'Only doctors and pharmacists can dispense' }, { status: 403 })
   }
 
