@@ -44,8 +44,13 @@ export async function GET(req: Request) {
       .from('medical_records')
       .select(`
       visit_date,
-      doctor_id,
-      visit_status
+      visit_status,
+      medical_staff: doctor_id (
+          users(
+            first_name,
+            last_name
+          )
+        )
       `)
       .eq('patient_id', patient.patient_id);
 
