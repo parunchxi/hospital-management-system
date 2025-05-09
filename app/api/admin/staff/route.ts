@@ -8,10 +8,10 @@ const validEmploymentStatus = ['Active', 'On_Leave', 'Resigned', 'Retired']
 
 // GET /api/admin/staff → List all staff by type
 export async function GET(req: Request) {
-  const role = await getUserRole()
+  const result = await getUserRole()
+  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  if (!role) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
+  const { role, userId } = result
   if (role !== 'Admin') {
     return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
   }
@@ -41,9 +41,10 @@ export async function GET(req: Request) {
 // POST /api/admin/staff → Create staff 
 export async function POST(req: Request) {
   const { user_id, department_id, staff_type, license_number, employment_status, date_hired, updated_at} = await req.json()
+  const result = await getUserRole()
+  if (!result) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await getUserRole()
-  if (!role) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { role, userId } = result
   if (role !== 'Admin') return NextResponse.json({ error: 'Forbidden: Admin only' }, { status: 403 })
 
   if (!department_id || !staff_type || !license_number || !employment_status || !updated_at) {
