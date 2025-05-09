@@ -76,5 +76,5 @@ export default function PharmacyLanding() {
         </section>
       </main>
     </div>
-  );
+  )
 }

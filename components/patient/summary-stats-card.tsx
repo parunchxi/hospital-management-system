@@ -15,12 +15,12 @@ export default function SummaryStatsCard({ appointments, billing }: Props) {
 
   return (
     <>
-      <Card className="hidden lg:block">
-        <CardHeader>
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" /> Upcoming
-            Appointments
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium">
+            Upcoming Appointments
           </CardTitle>
+          <Receipt className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{appointments.length}</div>

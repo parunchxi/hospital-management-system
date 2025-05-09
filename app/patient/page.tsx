@@ -9,19 +9,21 @@ import SummaryStatsCard from '@/components/patient/summary-stats-card'
 
 export default function PatientDashboard() {
   interface PatientProfile {
-    blood_type: string;
-    emergency_contact_id: number | null;
+    blood_type: string
+    emergency_contact_id: number | null
     users: {
-      address: string;
-      last_name: string;
-      first_name: string;
-      national_id: number;
-      phone_number: string;
-      date_of_birth: string;
-    };
+      address: string
+      last_name: string
+      first_name: string
+      national_id: number
+      phone_number: string
+      date_of_birth: string
+    }
   }
 
-  const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null)
+  const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(
+    null,
+  )
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
