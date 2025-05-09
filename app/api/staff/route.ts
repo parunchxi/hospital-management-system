@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   const department = searchParams.get('department')
 
   // Build the query dynamically
-  let query = supabase.from('medical_staff').select('*')
+  let query = supabase.from('medical_staff').select('*, users(first_name, last_name)')
 
   if (type) {
     query = query.eq('staff_type', type)
