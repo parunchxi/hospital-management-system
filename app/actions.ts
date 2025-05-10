@@ -151,6 +151,8 @@ export const signUpAction = async (formData: FormData) => {
       return redirect('/home/doctor')   
     } else if (role === 'Pharmacist') {
       return redirect('/pharmacy')
+    } else if (role === 'Nurse') {
+      return redirect('/nurse')
     }
    
     return redirect('/home')
