@@ -11,30 +11,14 @@ import {
 } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Calendar,
-  User,
-  Phone,
-  MapPin,
   FileText,
-  Activity,
-  Droplet,
-  Heart,
-  Clock,
-  CircleCheck,
   Loader2,
   AlertCircle,
 } from 'lucide-react'
 import AdmissionDetails from './admission-details'
+import PatientPersonalInfo from './patient-personal-info'
+import PatientMedicalRecords from './patient-medical-records'
 
 interface Patient {
   id?: string
@@ -57,6 +41,7 @@ interface Patient {
   }
   blood_type?: string
   medical_records?: Array<{
+    record_id?: string
     visit_date: string
     visit_status: string
     doctor_id?: {
@@ -65,6 +50,11 @@ interface Patient {
         last_name: string
       }
     }
+    diagnosis?: string
+    treatment?: string
+    notes?: string
+    symptoms?: string
+    prescription?: string
   }>
 }
 
@@ -176,100 +166,11 @@ export function PatientDetailsDialog({
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4 mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-medium flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    Personal Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Full Name</span>
-                      <span className="font-medium">
-                        {patientInfo.users?.first_name} {patientInfo.users?.last_name}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Date of Birth</span>
-                      <span className="font-medium flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                        {patientInfo.users?.date_of_birth ? new Date(patientInfo.users?.date_of_birth).toLocaleDateString() : "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Blood Type</span>
-                      <span className="font-medium flex items-center gap-1">
-                        <Droplet className="h-3.5 w-3.5 text-muted-foreground" />
-                        {patientInfo.blood_type || "Not recorded"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Phone Number</span>
-                      <span className="font-medium flex items-center gap-1">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                        {patientInfo.users?.phone_number || "Not provided"}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">National ID</span>
-                      <span className="font-medium">
-                        {patientInfo.users?.national_id || "Not provided"}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Address</span>
-                      <span className="font-medium flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                        {patientInfo.users?.address || "Not provided"}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <PatientPersonalInfo patientInfo={patientInfo} />
             </TabsContent>
 
             <TabsContent value="medical" className="space-y-4 mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-medium flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                    Visit History
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {patientInfo.medical_records && patientInfo.medical_records.length > 0 ? (
-                      <div className="border rounded-md divide-y">
-                        {patientInfo.medical_records.map((record, index) => (
-                          <div key={index} className="p-3 text-sm">
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                                <span>{new Date(record.visit_date).toLocaleDateString()}</span>
-                              </div>
-                              <Badge variant={record.visit_status === "Completed" ? "success" : "default"}>
-                                {record.visit_status}
-                              </Badge>
-                            </div>
-                            {record.doctor_id?.users && (
-                              <div className="text-muted-foreground mt-1">
-                                Dr. {record.doctor_id.users.first_name} {record.doctor_id.users.last_name}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">No medical records found</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <PatientMedicalRecords medicalRecords={patientInfo.medical_records} />
             </TabsContent>
 
             <TabsContent value="admission" className="space-y-4 mt-4">
