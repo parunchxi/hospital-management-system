@@ -1,5 +1,13 @@
 import { useState } from "react";
 import LowStockAlertCard from "./LowStockAlertCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Plus, Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Medicine {
   medicine_id: string;
@@ -14,20 +22,25 @@ interface Props {
 }
 
 export default function LowStockSection({ medicines, handleUpdateQuantity }: Props) {
-  const [showPopup, setShowPopup] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [addAmount, setAddAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handleAddClick = (medicine: Medicine) => {
     setSelectedMedicine(medicine);
-    setShowPopup(true);
+    setAddAmount(0); // Reset amount when opening dialog
+    setShowDialog(true);
   };
 
   const handleAddAmount = async () => {
     if (!selectedMedicine || addAmount <= 0) {
-      alert("Please enter a valid amount greater than 0.");
+      toast({
+        variant: "destructive",
+        title: "Invalid Input",
+        description: "Please enter a valid amount greater than 0.",
+      });
       return;
     }
 
@@ -37,12 +50,20 @@ export default function LowStockSection({ medicines, handleUpdateQuantity }: Pro
         parseInt(selectedMedicine.medicine_id),
         selectedMedicine.quantity + addAmount
       );
-      setShowPopup(false);
-      setAddAmount(0);
-      setSuccessMessage(`Successfully added ${addAmount} to ${selectedMedicine.name}`);
-      setTimeout(() => setSuccessMessage(null), 5000); // Clear the message after 5 seconds
+      setShowDialog(false);
+      
+      toast({
+        title: "Stock Updated Successfully",
+        description: `Added ${addAmount} units to ${selectedMedicine.name}`,
+        variant: "default",
+        duration: 5000,
+      });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "An error occurred while updating the quantity.");
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: error instanceof Error ? error.message : "An error occurred while updating the quantity.",
+      });
     } finally {
       setLoading(false);
     }
@@ -50,82 +71,113 @@ export default function LowStockSection({ medicines, handleUpdateQuantity }: Pro
 
   return (
     <section className="mt-12">
-      <h2 className="text-xl font-semibold mb-4 text-pink-700 flex items-center gap-2">
-        <span>Low Stock Alert</span>
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {medicines.map((med) => (
-          <div key={med.medicine_id} className="relative border border-gray-200 rounded-lg shadow-md ">
-            <LowStockAlertCard
-              id={med.medicine_id}
-              name={med.name}
-              dosage={med.dosage}
-              quantity={med.quantity}
-            />
-            <button
-              onClick={() => handleAddClick(med)}
-              className="absolute bottom-4 right-4 bg-red-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              aria-label={`Add stock for ${med.name}`}
-            >
-              +
-            </button>
+      <Card className="border-l-4 border-yellow-500">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Low Stock Alert
+            </CardTitle>
           </div>
-        ))}
-      </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {medicines.map((med) => (
+              <div key={med.medicine_id} className="relative group">
+                <LowStockAlertCard
+                  id={med.medicine_id}
+                  name={med.name}
+                  dosage={med.dosage}
+                  quantity={med.quantity}
+                />
+                <Button
+                  onClick={() => handleAddClick(med)}
+                  className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white shadow-md rounded-full h-10 w-10 p-0 flex items-center justify-center transition-all opacity-90 group-hover:opacity-100"
+                  size="icon"
+                  variant="default"
+                  aria-label={`Add stock for ${med.name}`}
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Popup */}
-      {showPopup && selectedMedicine && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transition-transform transform scale-100 duration-300">
-
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              Add Quantity for <span className="text-pink-700">{selectedMedicine.name}</span>
-            </h3>
-            <input
-              type="number"
-              value={addAmount}
-              onChange={(e) => setAddAmount(Math.max(0, Number(e.target.value)))}
-              onWheel={(e) => e.currentTarget.blur()}
-              placeholder="e.g. 20"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
-              min={1}
-            />
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowPopup(false)}
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddAmount}
-                disabled={loading}
-                className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 ${loading
-                  ? "bg-gray-400 cursor-not-allowed focus:ring-gray-400"
-                  : "bg-green-600 hover:bg-green-700 focus:ring-green-500"
-                  }`}
-              >
-                {loading ? "Updating..." : "Add"}
-              </button>
+      {/* Dialog for adding stock */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span>Restock Medicine</span>
+              {selectedMedicine && (
+                <Badge className="ml-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                  Current: {selectedMedicine.quantity}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {selectedMedicine && (
+              <div className="mb-4">
+                <div className="text-sm font-medium mb-1 text-gray-500">Medicine</div>
+                <div className="text-lg font-semibold text-gray-900">{selectedMedicine.name}</div>
+                <div className="text-sm text-gray-500">{selectedMedicine.dosage}</div>
+              </div>
+            )}
+            
+            <div className="space-y-3">
+              <Label htmlFor="amount" className="text-sm font-medium">
+                Amount to Add
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                value={addAmount || ''}
+                onChange={(e) => setAddAmount(Math.max(0, Number(e.target.value)))}
+                min={1}
+                className="w-full"
+                placeholder="Enter quantity"
+              />
+              
+              {selectedMedicine && addAmount > 0 && (
+                <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md">
+                  New stock level will be: <span className="font-semibold">{selectedMedicine.quantity + addAmount}</span>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Success Toast */}
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-md shadow-lg flex items-center gap-2 transition transform animate-slide-in fade-in-out">
-          <span>{successMessage}</span>
-          <button
-            onClick={() => setSuccessMessage(null)}
-            className="text-white hover:text-gray-200 focus:outline-none"
-            aria-label="Dismiss"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDialog(false)}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddAmount}
+              disabled={loading || addAmount <= 0}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Stock
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
