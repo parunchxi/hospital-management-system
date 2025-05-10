@@ -16,10 +16,12 @@ export async function GET(req: Request, { params }: { params: { record_id: strin
   }
 
   const supabase = await createClient();
+  const resolved_params = await params;
+  const rec_id = resolved_params.record_id;
   const { data, error } = await supabase
     .from('medical_records')  
     .select('*')
-    .eq('record_id', params.record_id)  
+    .eq('record_id', rec_id)  
     .single();  
 
   if (error || !data) {
@@ -27,3 +29,4 @@ export async function GET(req: Request, { params }: { params: { record_id: strin
   }
 
   return NextResponse.json(data);  // Return the medical record data
+}
