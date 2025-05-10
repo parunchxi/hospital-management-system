@@ -20,6 +20,14 @@ interface StatCardsProps {
   data: Stat[] | { stats: Stat[] } | null | undefined
 }
 
+// Helper function to get Icon component - outside of the React component
+function getIconComponent(iconName: string): IconComponent {
+  // Check if the icon exists in LucideIcons
+  const IconComp = (LucideIcons as unknown as Record<string, IconComponent>)[iconName];
+  // Return the icon or fallback to HelpCircle
+  return IconComp || LucideIcons.HelpCircle;
+}
+
 export function StatCards({ data }: StatCardsProps) {
   // Handle different data formats or no data
   const statsArray = React.useMemo(() => {
@@ -37,13 +45,10 @@ export function StatCards({ data }: StatCardsProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {statsArray.map((stat, i) => {
         // Get the icon name as string
-        const iconName = stat.icon.toString() as IconName;
+        const iconName = String(stat.icon);
         
-        // Use a safe approach to get the icon component
-        const IconComponent = React.useMemo(() => {
-          // Try to get the icon from the Lucide library
-          return (LucideIcons[iconName] || LucideIcons.HelpCircle) as IconComponent;
-        }, [iconName]);
+        // Get the icon component using our helper function
+        const IconComponent = getIconComponent(iconName);
         
         return (
           <Card key={i}>
