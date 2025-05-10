@@ -75,7 +75,7 @@ export default function PatientDashboard() {
       </header>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <PatientInfoCard patientProfile={patientProfile} />
-        <AppointmentCalendarCard />
+        <AppointmentCalendarCard appointments={appointments}/>
         <UpcomingAppointmentsTable appointments={appointments} />
       </section>
 

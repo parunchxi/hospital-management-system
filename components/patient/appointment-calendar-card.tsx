@@ -1,8 +1,41 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { Calendar } from '@/components/ui/calendar'
+import { format, isSameDay, parseISO } from 'date-fns'
 
-export default function AppointmentCalendarCard() {
+interface Appointment {
+  date: string
+  doctor: string
+  status: 'Scheduled' | 'Completed' | 'Canceled'
+}
+
+export default function AppointmentCalendarCard({
+  appointments,
+}: {
+  appointments: {
+    visit_date: string
+    visit_status: 'Scheduled' | 'Completed' | 'Canceled'
+    medical_staff: {
+      users: {
+        last_name: string
+        first_name: string
+      }
+    }
+  }[]
+}) {
+  const appointmentDates = appointments.map(appt => parseISO(appt.visit_date))
+  
+  const modifiersClassNames = {
+    appointment: "bg-blue-500 text-white font-medium rounded-full"
+  }
+  
+  const modifiers = {
+    appointment: (date: Date) => 
+      appointmentDates.some(appointmentDate => 
+        isSameDay(date, appointmentDate)
+      )
+  }
+  
   return (
     <Card className="lg:col-span-1">
       <CardHeader>
@@ -13,7 +46,10 @@ export default function AppointmentCalendarCard() {
       </CardHeader>
       <CardContent>
         <div className="max-w-xs mx-auto">
-          <Calendar />
+          <Calendar 
+            modifiers={modifiers}
+            modifiersClassNames={modifiersClassNames}
+          />
         </div>
       </CardContent>
     </Card>
