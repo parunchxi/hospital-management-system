@@ -11,7 +11,6 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
-  /* ── read & validate body ─────────────────────────────── */
   const body = await req.json().catch(() => null) as
     | { patient_id?: number; total_price?: number }
     | null;
@@ -25,7 +24,6 @@ export async function POST(req: NextRequest) {
 
   const totalPrice = typeof body.total_price === 'number' ? body.total_price : 0;
 
-  /* ── authorise user ───────────────────────────────────── */
   const userRole = await getUserRole();
   if (!userRole) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -34,7 +32,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'You do not have permission.' }, { status: 403 });
   }
 
-  /* ── insert the bill ──────────────────────────────────── */
   const { data, error } = await supabase
     .from('billing')
     .insert(

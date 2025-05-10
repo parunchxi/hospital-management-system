@@ -12,10 +12,8 @@ const supabase = createClient(
 
 export async function GET(
   req: NextRequest,
-  /* ⬇︎ ประกาศเป็น Promise ให้ตรงทุกเมธอดในโฟลเดอร์ */
   { params }: { params: Promise<{ record_id: string }> }
 ) {
-  /* ต้อง await params */
   const { record_id } = await params;
   const recordId = Number(record_id);
 
@@ -23,7 +21,6 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid record_id' }, { status: 400 });
   }
 
-  /* เช็ก role */
   const userRole = await getUserRole();          // ← ส่ง req เข้าไป
   if (!userRole) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,7 +33,6 @@ export async function GET(
     );
   }
 
-  /* ดึงข้อมูล dispense + ชื่อยา */
   const { data, error } = await supabase
     .from('medicine_dispense')
     .select(`

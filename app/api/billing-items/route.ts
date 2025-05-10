@@ -12,7 +12,7 @@ const supabase = createClient(
 
 type ItemBody = {
   bill_id     : number;
-  item_type   : 'Medicine' | 'Treatment';   // ให้ตรง enum
+  item_type   : 'Medicine' | 'Treatment';   
   item_id_ref : number;
   description : string;
   quantity    : number;
@@ -20,7 +20,6 @@ type ItemBody = {
 };
 
 export async function POST(req: NextRequest) {
-  /* ── 1. รับ-validate body ─────────────────────── */
   const body = (await req.json().catch(() => null)) as ItemBody | null;
 
   if (
@@ -38,8 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Quantity must be > 0 and price >= 0.' }, { status: 400 });
   }
 
-  /* ── 2. Authorise (Admin เท่านั้น) ────────────── */
-  const userRole = await getUserRole();          // ✅ ส่ง req
+  const userRole = await getUserRole();         
   if (!userRole) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -47,7 +45,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'You do not have permission.' }, { status: 403 });
   }
 
-  /* ── 3. เช็กว่า bill มีจริง ───────────────────── */
   const { data: billRow, error: billErr } = await supabase
     .from('billing')
     .select('total_price')
@@ -58,7 +55,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Bill not found.' }, { status: 400 });
   }
 
-  /* ── 4. เพิ่มรายการ item ─────────────────────── */
   const itemTotal = body.quantity * body.unit_price;
 
   const { error: insertErr } = await supabase
@@ -77,7 +73,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: insertErr.message }, { status: 500 });
   }
 
-  /* ── 5. อัปเดตราคารวมใบเสร็จ ───────────────── */
   const { error: updErr } = await supabase
     .from('billing')
     .update({

@@ -14,10 +14,8 @@ type Status = 'Pending' | 'Paid' | 'Cancelled';
 
 export async function PATCH(
   req: NextRequest,
-  /* 👇  ใช้ Promise ตรง ๆ  */
   { params }: { params: Promise<{ id: string }> }
 ) {
-  /* ต้อง await ตัว params */
   const { id } = await params;
   const billId = Number(id);
   if (isNaN(billId)) {

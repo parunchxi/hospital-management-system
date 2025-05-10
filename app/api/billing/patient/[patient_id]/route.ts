@@ -12,9 +12,8 @@ const supabase = createClient(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ patient_id: string }> }   // <— ใช้ Promise
+  { params }: { params: Promise<{ patient_id: string }> }   
 ) {
-  // ต้อง await params
   const { patient_id } = await params;
   const patientId = Number(patient_id);
   if (isNaN(patientId)) {

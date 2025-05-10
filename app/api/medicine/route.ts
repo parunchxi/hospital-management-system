@@ -8,7 +8,6 @@ const supabase = createClient(
 )
 
 export async function GET(req: NextRequest) {
-  // ✅ 1. Get user role from session
   const userRole = await getUserRole()
 
   if (!userRole) {
@@ -20,7 +19,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden: Insufficient role' }, { status: 403 })
   }
 
-  // ✅ 2. Fetch medicine stock
   const { data, error } = await supabase.from('medicine_stock').select('*')
 
   if (error) {
