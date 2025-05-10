@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Plus, Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+// Change the toast import to use the custom implementation
+import { toast } from "@/components/patient/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -26,7 +27,7 @@ export default function LowStockSection({ medicines, handleUpdateQuantity }: Pro
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [addAmount, setAddAmount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  // Remove the useToast hook since we're using direct toast function
 
   const handleAddClick = (medicine: Medicine) => {
     setSelectedMedicine(medicine);

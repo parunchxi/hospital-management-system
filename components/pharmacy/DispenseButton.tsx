@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { toast } from "@/components/patient/use-toast";
 
 interface DispenseButtonProps {
   onDispenseSuccess?: () => Promise<void>;
@@ -73,7 +74,11 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
       const data = await res.json();
       setRecords(data);
     } catch (err: any) {
-      alert(`Error fetching records: ${err.message}`);
+      toast({
+        title: "Error",
+        description: `Error fetching records: ${err.message}`,
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +94,11 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
       const data = await res.json();
       setMedicines(data);
     } catch (err: any) {
-      alert(`Error fetching medicines: ${err.message}`);
+      toast({
+        title: "Error",
+        description: `Error fetching medicines: ${err.message}`,
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -133,11 +142,19 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
         const errorData = await res.json();
         throw new Error(errorData.error || "Dispense failed");
       }
-      alert("Medicine dispensed successfully!");
+      toast({
+        title: "Success",
+        description: "Medicine dispensed successfully!",
+        variant: "default"
+      });
       setIsDialogOpen(false);
       onDispenseSuccess?.();
     } catch (err: any) {
-      alert(`Error dispensing medicine: ${err.message}`);
+      toast({
+        title: "Error",
+        description: `Error dispensing medicine: ${err.message}`,
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
