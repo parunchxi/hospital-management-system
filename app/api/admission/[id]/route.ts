@@ -46,8 +46,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 // PATCH /api/admissions/:id → Update discharge date, nurse assigned
-export async function PATCH(req: Request, context: { params: { id: string } }) {
-    const { id } = context.params;
+export async function PATCH(req: Request, {params}: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const { discharge_date, nurse_id } = await req.json();
   
     const result = await getUserRole();

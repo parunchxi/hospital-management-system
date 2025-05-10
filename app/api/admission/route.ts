@@ -145,28 +145,57 @@ export async function GET() {
   }
   const { role } = result
 
-  if (role !== 'Admin') {
-    return NextResponse.json(
-      { error: 'Forbidden: Only admins can view all admission records' },
-      { status: 403 },
-    )
+  if (role == 'Admin') {
+
+    // Fetch all admission data
+    const { data, error } = await supabase
+      .from('admissions')
+      .select(`
+        *
+      `)
+      .order('admission_date', { ascending: false })
+
+    if (error) {
+      console.error('Get admissions error:', error)
+      return NextResponse.json(
+        { error: 'Failed to retrieve admission records' },
+        { status: 500 },
+      )
+    }
+    return NextResponse.json({ data }, { status: 200 })
+  } else if (role == 'Nurse') { 
+
+    // Fetch admissions for the logged-in nurse
+    const { data: nurse, error: nurseError } = await supabase
+      .from('medical_staff')
+      .select('staff_id, staff_type')
+      .eq('user_id', result.userId)
+      .single()
+
+    if (nurseError || !nurse) {
+      return NextResponse.json(
+        { error: 'Failed to retrieve nurse information' },
+        { status: 500 },
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('admissions')
+      .select(`
+        *, 
+        rooms: room_id ( departments: department_id ( name ) )
+      `)
+      .eq('nurse_id', nurse.staff_id)
+      .order('admission_date', { ascending: false })
+
+    if (error) {
+      console.error('Get admissions error:', error)
+      return NextResponse.json(
+        { error: 'Failed to retrieve admission records' },
+        { status: 500 },
+      )
+    }
+
+    return NextResponse.json({ data }, { status: 200 })
   }
-
-  // Fetch all admission data
-  const { data, error } = await supabase
-    .from('admissions')
-    .select(`
-      *
-    `)
-    .order('admission_date', { ascending: false })
-
-  if (error) {
-    console.error('Get admissions error:', error)
-    return NextResponse.json(
-      { error: 'Failed to retrieve admission records' },
-      { status: 500 },
-    )
-  }
-
-  return NextResponse.json({ data }, { status: 200 })
 }
