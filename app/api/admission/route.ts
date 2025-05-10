@@ -134,3 +134,39 @@ export async function POST(req: Request) {
 
   return NextResponse.json(data, { status: 201 })
 }
+
+// GET /api/admission → Get all admissions (Admin only)
+export async function GET() {
+  const supabase = await createClient()
+  const result = await getUserRole()
+
+  if (!result) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const { role } = result
+
+  if (role !== 'Admin') {
+    return NextResponse.json(
+      { error: 'Forbidden: Only admins can view all admission records' },
+      { status: 403 },
+    )
+  }
+
+  // Fetch all admission data
+  const { data, error } = await supabase
+    .from('admissions')
+    .select(`
+      *
+    `)
+    .order('admission_date', { ascending: false })
+
+  if (error) {
+    console.error('Get admissions error:', error)
+    return NextResponse.json(
+      { error: 'Failed to retrieve admission records' },
+      { status: 500 },
+    )
+  }
+
+  return NextResponse.json({ data }, { status: 200 })
+}
