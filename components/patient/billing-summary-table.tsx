@@ -18,17 +18,33 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-interface Invoice {
-  id: string
-  amount: string
-  status: 'Paid' | 'Pending'
+interface BillingItem {
+  item_id: number;
+  quantity: number;
+  item_type: string;
+  unit_price: number;
+  description: string;
+  item_id_ref: number;
+  total_price: number;
+}
+
+interface Billing {
+  bill_id: number;
+  total_price: number;
+  status: 'Paid' | 'Pending';
+  created_at: string;
+  updated_at: string;
+  billing_items: BillingItem[];
+}
+
+interface Props {
+  appointments: { status: string }[];
+  billing: Billing[];
 }
 
 export default function BillingSummaryTable({
   billing,
-}: {
-  billing: Invoice[]
-}) {
+}: Props) {
   const getStatusVariant = (status: 'Paid' | 'Pending') =>
     status === 'Paid' ? 'default' : 'destructive'
 
@@ -49,10 +65,10 @@ export default function BillingSummaryTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {billing.map(({ id, amount, status }, index) => (
+            {billing.map(({ bill_id, total_price, status }, index) => (
               <TableRow key={index} className="text-sm [&>td]:py-3">
-                <TableCell className="font-medium">{id}</TableCell>
-                <TableCell>{amount}</TableCell>
+                <TableCell className="font-medium">{bill_id}</TableCell>
+                <TableCell>${total_price.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(status)}>{status}</Badge>
                 </TableCell>

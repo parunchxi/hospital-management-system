@@ -40,12 +40,13 @@ export default function UpcomingAppointmentsTable({
   const getStatusVariant = (status: 'Scheduled' | 'Completed' | 'Canceled') => {
     switch (status) {
       case 'Completed':
-        return 'default'
+        return 'success'
       case 'Canceled':
         return 'destructive'
       case 'Scheduled':
+        return 'default'
       default:
-        return 'secondary'
+        return 'outline'
     }
   }
 

@@ -1,15 +1,34 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { CalendarDays, Receipt, Wallet, Stethoscope } from 'lucide-react'
 
+interface BillingItem {
+  item_id: number;
+  quantity: number;
+  item_type: string;
+  unit_price: number;
+  description: string;
+  item_id_ref: number;
+  total_price: number;
+}
+
+interface Billing {
+  bill_id: number;
+  total_price: number;
+  status: 'Paid' | 'Pending';
+  created_at: string;
+  updated_at: string;
+  billing_items: BillingItem[];
+}
+
 interface Props {
-  appointments: { status: string }[]
-  billing: { amount: string; status: 'Paid' | 'Pending' }[]
+  appointments: { status: string }[];
+  billing: Billing[];
 }
 
 export default function SummaryStatsCard({ appointments, billing }: Props) {
   const totalPaid = billing
-    .filter((b) => b.status === 'Paid')
-    .reduce((acc, b) => acc + parseFloat(b.amount.replace('$', '')), 0)
+    .filter((b) => b.status === 'Pending')
+    .reduce((acc, b) => acc + b.total_price, 0)
 
   const pending = billing.filter((b) => b.status === 'Pending').length
 
@@ -20,7 +39,7 @@ export default function SummaryStatsCard({ appointments, billing }: Props) {
           <CardTitle className="text-sm font-medium">
             Upcoming Appointments
           </CardTitle>
-          <Receipt className="h-4 w-4 text-muted-foreground" />
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{appointments.length}</div>
@@ -39,12 +58,12 @@ export default function SummaryStatsCard({ appointments, billing }: Props) {
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
+          <CardTitle className="text-sm font-medium">Total</CardTitle>
           <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">${totalPaid.toFixed(2)}</div>
-          <p className="text-xs text-muted-foreground">Already cleared</p>
+          <p className="text-xs text-muted-foreground">Need to be paid</p>
         </CardContent>
       </Card>
       <Card>

@@ -23,7 +23,9 @@ export default function AppointmentCalendarCard({
     }
   }[]
 }) {
-  const appointmentDates = appointments.map(appt => parseISO(appt.visit_date))
+  const scheduledAppointmentDates = appointments
+    .filter(appt => appt.visit_status === 'Scheduled')
+    .map(appt => parseISO(appt.visit_date))
   
   const modifiersClassNames = {
     appointment: "bg-blue-500 text-white font-medium rounded-full"
@@ -31,7 +33,7 @@ export default function AppointmentCalendarCard({
   
   const modifiers = {
     appointment: (date: Date) => 
-      appointmentDates.some(appointmentDate => 
+      scheduledAppointmentDates.some(appointmentDate => 
         isSameDay(date, appointmentDate)
       )
   }

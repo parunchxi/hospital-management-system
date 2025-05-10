@@ -25,15 +25,18 @@ export default function PatientDashboard() {
     null,
   )
   const [appointments, setAppointments] = useState([])
+  const [billing, setBilling] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
+      
       try {
-        const [patientResponse, appointmentsResponse] = await Promise.all([
+        const [patientResponse, appointmentsResponse, billingResponse] = await Promise.all([
           fetch('/api/patients/me'),
           fetch('/api/appointments'),
+          fetch('/api/billing/patient/me'),
         ])
 
         if (!patientResponse.ok) {
@@ -45,9 +48,11 @@ export default function PatientDashboard() {
 
         const patientData = await patientResponse.json()
         const appointmentsData = await appointmentsResponse.json()
+        const billingData = await billingResponse.json()
 
         setPatientProfile(patientData)
         setAppointments(appointmentsData)
+        setBilling(billingData)
       } catch (err) {
         setError('An error occurred while fetching data')
       } finally {
@@ -61,10 +66,6 @@ export default function PatientDashboard() {
   if (loading) return <div>Loading...</div>
   if (error) return <div>Failed to load data: {error}</div>
 
-  const billing = [
-    { id: '1', amount: '$120.00', status: 'Paid' as 'Paid' },
-    { id: '2', amount: '$80.00', status: 'Pending' as 'Pending' },
-  ]
 
   return (
     <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
@@ -83,7 +84,7 @@ export default function PatientDashboard() {
         <SummaryStatsCard appointments={appointments} billing={billing} />
       </section>
 
-      <BillingSummaryTable billing={billing} />
+      <BillingSummaryTable billing={billing} appointments={appointments} />
     </div>
   )
 }
