@@ -74,6 +74,7 @@ export async function GET(req: Request) {
     const { data, error } = await supabase
       .from('medical_records')
       .select(`
+        patient_id,
         record_id,
         symptoms,
         patient_status,
