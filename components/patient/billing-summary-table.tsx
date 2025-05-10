@@ -48,6 +48,16 @@ export default function BillingSummaryTable({
   const getStatusVariant = (status: 'Paid' | 'Pending') =>
     status === 'Paid' ? 'default' : 'destructive'
 
+  // Format date function
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   return (
     <Card className="lg:col-span-2 order-2 lg:order-none">
       <CardHeader>
@@ -58,20 +68,22 @@ export default function BillingSummaryTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Invoice ID</TableHead>
+              <TableHead>Number</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Updated Date</TableHead>
               <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {billing.map(({ bill_id, total_price, status }, index) => (
+            {billing.map(({ bill_id, total_price, status, updated_at }, index) => (
               <TableRow key={index} className="text-sm [&>td]:py-3">
-                <TableCell className="font-medium">{bill_id}</TableCell>
+                <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>${total_price.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(status)}>{status}</Badge>
                 </TableCell>
+                <TableCell>{formatDate(updated_at)}</TableCell>
                 <TableCell className="text-right">
                   <Button size="sm" variant="outline">
                     View Receipt
