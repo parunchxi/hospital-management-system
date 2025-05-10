@@ -2,46 +2,47 @@
 
 import React, { useState } from 'react'
 import { PatientDetailsDialog } from '@/components/doctor/patient-details-dialog'
-import AppointmentsTable from '../../../components/doctor/AppointmentsTable'
-import MedicineStockTable from '../../../components/doctor/MedicineStockTable'
-import RoomAvailabilityTable from '../../../components/doctor/FreeRooms'
-import DoctorInfoCard from '../../../components/doctor/DoctorInfo'
-import DoctorCalendar from '../../../components/doctor/Calendar'
-import FloatingActionMenu from '../../../components/doctor/FloatingActionMenu'
+import AppointmentsTable from '@/components/doctor/AppointmentsTable'
+import MedicineStockTable from '@/components/doctor/MedicineStockTable'
+import RoomAvailabilityTable from '@/components/doctor/FreeRooms'
+import DoctorInfoCard from '@/components/doctor/DoctorInfo'
+import DoctorCalendar from '@/components/doctor/Calendar'
+import FloatingActionMenu from '@/components/doctor/FloatingActionMenu'
 
-const DoctorDashboard = () => {
+export default function DoctorDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedPatient, setSelectedPatient] = useState<any>(null)
+  const [selectedRecord, setSelectedRecord] = useState<any>(null)
 
   // Function to handle row click from AppointmentsTable
-  const handleRowClick = (patient: any) => {
-    setSelectedPatient(patient)
+  const handleRowClick = (record: any) => {
+    setSelectedRecord(record)
     setDialogOpen(true)
   }
-
   return (
-    <div className="flex flex-col items-center min-h-screen bg-light-blue-50 p-6 mb-35">
-      <h1 className="text-2xl font-bold mb-6">
-        👋 Hello, Dr. <DoctorInfoCard type="name" />!
-      </h1>
-      <div className="w-full max-h-10xl overflow-shown mb-35">
-        {/* <pre>{JSON.stringify(selectedPatient, null, 2)}</pre> */}
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-8 grid grid-cols-1 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
+    <>
+      <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">
+            👋 Hello, Dr. <DoctorInfoCard type="name" />!
+          </h1>
+        </header>
+
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 grid grid-cols-1 gap-6">
             <AppointmentsTable onRowClick={handleRowClick} />
             <MedicineStockTable />
             <RoomAvailabilityTable />
           </div>
-          <div className="col-span-4 grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <DoctorInfoCard />
             <DoctorCalendar />
           </div>
-        </div>
+        </section>
+
+        <PatientDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} patient={selectedRecord} />
       </div>
-      <PatientDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} patient={selectedPatient} />
+      {/* FloatingActionMenu rendered outside main container for proper positioning */}
       <FloatingActionMenu />
-    </div>
+    </>
   )
 }
-
-export default DoctorDashboard

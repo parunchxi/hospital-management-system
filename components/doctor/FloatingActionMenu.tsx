@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { PlusIcon } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog'
+import {
+  PlusIcon,
+  CalendarPlus,
+  Hospital,
+  Clipboard
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Toaster } from 'sonner'
 import { AdmissionForm } from './AdmissionForm'
@@ -220,27 +236,28 @@ const FloatingActionMenu: React.FC = () => {
     setAppointmentInput('')
     setDialogType(null)
   }
-
   return (
     <>
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-8 right-8 z-[100]">
         <DropdownMenu open={openMenu} onOpenChange={setOpenMenu}>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon" className="rounded-full h-14 w-14 shadow-lg">
-              <PlusIcon className="h-6 w-6" />
+            <Button variant="default" size="icon" className="rounded-full h-14 w-14 shadow-lg bg-primary hover:bg-primary/90">
+              <PlusIcon className="h-6 w-6 text-primary-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="end" className="w-56">
             <DropdownMenuItem
-              className="cursor-pointer"
+              className="cursor-pointer flex items-center gap-2"
               onClick={() => { setDialogType('admission'); setOpenMenu(false) }}
             >
+              <Hospital className="h-4 w-4" />
               Create Admission
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="cursor-pointer"
+              className="cursor-pointer flex items-center gap-2"
               onClick={() => { setDialogType('appointment'); setOpenMenu(false) }}
             >
+              <CalendarPlus className="h-4 w-4" />
               Create Appointment
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -254,7 +271,13 @@ const FloatingActionMenu: React.FC = () => {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">Create New Admission</DialogTitle>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Hospital className="h-5 w-5 text-muted-foreground" />
+              Create New Admission
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Admit a patient to the hospital
+            </DialogDescription>
           </DialogHeader>
 
           <AdmissionForm
@@ -281,7 +304,13 @@ const FloatingActionMenu: React.FC = () => {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">Create New Appointment</DialogTitle>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <CalendarPlus className="h-5 w-5 text-muted-foreground" />
+              Create New Appointment
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Schedule a new patient appointment
+            </DialogDescription>
           </DialogHeader>
 
           <AppointmentForm

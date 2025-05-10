@@ -1,8 +1,28 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from '@/components/ui/card'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { CalendarClock } from 'lucide-react'
 
 interface AppointmentsTableProps {
-  onRowClick: (patient: any) => void
+  onRowClick: (record: any) => void
 }
 
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => {
@@ -10,6 +30,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
   const [isLoading, setLoading] = useState(true)
   const [visibleAppointments, setVisibleAppointments] = useState(3)
   const [initialRowsShown, setInitialRowsShown] = useState(true)
+
   useEffect(() => {
     fetch('/api/appointments')
       .then((res) => {
@@ -33,74 +54,106 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
     setVisibleAppointments((prev) => prev + 3)
     setInitialRowsShown(false)
   }
+
   const showLessAppointments = () => {
     setVisibleAppointments(3)
     setInitialRowsShown(true)
   }
 
-  if (isLoading) return <p>Loading appointments...</p>
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'Completed':
+        return 'success'
+      case 'Canceled':
+        return 'destructive'
+      case 'Scheduled':
+        return 'default'
+      default:
+        return 'outline'
+    }
+  }
+
+  if (isLoading) return (
+    <Card>
+      <CardContent className="p-6 flex justify-center items-center">
+        Loading appointments...
+      </CardContent>
+    </Card>
+  )
 
   return (
-    <div className="bg-white p-4 shadow rounded">
-      <h2 className="text-black font-bold mb-4">Appointments</h2>
-      <div className="overflow-auto max-h-[350px]">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="sticky top-0 bg-gray-100">
-            <tr className="text-black">
-              <th className="border border-gray-300 p-2">Patient Name</th>
-              <th className="border border-gray-300 p-2">Case</th>
-              <th className="border border-gray-300 p-2">Patient Status</th>
-              <th className="border border-gray-300 p-2">Visit Date</th>
-              <th className="border border-gray-300 p-2">Case Status</th>
-            </tr>
-          </thead>          <tbody>
-            {appointments && appointments.length > 0 ? (
-              appointments.slice(0, visibleAppointments).map((patient: any) => (
-                <tr
-                  key={patient.record_id}
-                  className="text-black hover:bg-gray-50 cursor-pointer"
-                  onClick={() => onRowClick(patient)}
-                >
-                  <td className="border border-gray-300 p-2">
-                    {patient.patients?.users?.first_name} {patient.patients?.users?.last_name}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {patient.symptoms || 'Not specified'}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {patient.patient_status}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {patient.visit_date ? new Date(patient.visit_date).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {patient.visit_status}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="border border-gray-300 p-2 text-center" colSpan={5}>
-                  No appointments available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex justify-center gap-4 mt-4">
-        {appointments && appointments.length > 3 && (
-          <>
-            {appointments.length > visibleAppointments && (
-              <Button onClick={loadMoreAppointments} variant="outline" size="sm">Load More</Button>
-            )}
-            {!initialRowsShown && (
-              <Button onClick={showLessAppointments} variant="outline" size="sm">Show Less</Button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg font-bold flex items-center gap-2">
+          <CalendarClock className="h-5 w-5 text-muted-foreground" />
+          Appointments
+        </CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">
+          Manage your patient appointments
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="px-0">
+        <div className="overflow-auto max-h-[350px]">
+          <Table>
+            <TableHeader className="sticky top-0 bg-muted">
+              <TableRow>
+                <TableHead>Patient Name</TableHead>
+                <TableHead>Case</TableHead>
+                <TableHead>Patient Status</TableHead>
+                <TableHead>Visit Date</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {appointments && appointments.length > 0 ? (
+                appointments.slice(0, visibleAppointments).map((record: any) => (
+                  <TableRow
+                    // key={record.record_id}
+                    className="cursor-pointer"
+                    onClick={() => {
+                        // alert(`Row clicked, patient data: ${JSON.stringify(record, null, 2)}`);
+                      onRowClick(record);
+                    }}
+                  >
+                    <TableCell>
+                      {record.patients?.users?.first_name} {record.patients?.users?.last_name}
+                    </TableCell>
+                    <TableCell>{record.symptoms || 'Not specified'}</TableCell>
+                    <TableCell>{record.patient_status || 'Unknown'}</TableCell>
+                    <TableCell>
+                      {record.visit_date ?
+                        new Date(record.visit_date).toLocaleDateString() :
+                        'Not scheduled'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(record.visit_status)}>
+                        {record.visit_status || 'Unknown'}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-4">
+                    No appointments found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+      {appointments && appointments.length > 3 && (
+        <CardFooter className="flex justify-center gap-4 pt-2">
+          {appointments.length > visibleAppointments && (
+            <Button onClick={loadMoreAppointments} variant="outline" size="sm">Load More</Button>
+          )}
+          {!initialRowsShown && (
+            <Button onClick={showLessAppointments} variant="outline" size="sm">Show Less</Button>
+          )}
+        </CardFooter>
+      )}
+    </Card>
   )
 }
 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User, Calendar } from 'lucide-react';
 
 interface PatientSearchProps {
   patientId: string;
@@ -22,13 +22,16 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
 }) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="patient-id">{label}</Label>
+      <Label htmlFor="patient-id" className="text-sm font-medium">
+        {label}
+      </Label>
       <div className="space-y-2">
         <Input
           id="patient-id"
           value={patientId}
           onChange={onChange}
           placeholder="Enter patient ID"
+          className="w-full"
           required
         />
 
@@ -39,17 +42,26 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
           </div>
         )}
 
-        {error && <div className="text-sm text-destructive">{error}</div>}
+        {error && (
+          <div className="text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
         {patient && (
-          <div className="text-sm p-3 border rounded-md bg-muted/50">
-            <div>
-              <span className="font-semibold">Name:</span> {patient.users?.first_name} {patient.users?.last_name}
+          <div className="text-sm p-3 border rounded-md bg-muted/50 space-y-2">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">
+                {patient.users?.first_name} {patient.users?.last_name}
+              </span>
             </div>
             {patient.users?.date_of_birth && (
-              <div>
-                <span className="font-semibold">DOB:</span>{" "}
-                {new Date(patient.users.date_of_birth).toLocaleDateString()}
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {new Date(patient.users.date_of_birth).toLocaleDateString()}
+                </span>
               </div>
             )}
           </div>

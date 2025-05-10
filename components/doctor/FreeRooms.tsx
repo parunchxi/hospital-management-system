@@ -1,4 +1,22 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from '@/components/ui/card'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
+import { DoorOpen } from 'lucide-react'
 
 interface Room {
   room_id: string
@@ -25,42 +43,58 @@ const RoomAvailabilityTable: React.FC = () => {
       .catch(() => setLoading(false))
   }, [])
 
-  if (isLoading) return <p>Loading rooms...</p>
+  if (isLoading) return (
+    <Card>
+      <CardContent className="p-6 flex justify-center items-center">
+        Loading rooms...
+      </CardContent>
+    </Card>
+  )
 
   return (
-    <div className="bg-white p-4 shadow rounded">
-      <h2 className="text-black font-bold mb-4">Room Availability</h2>
-      <div className="overflow-auto max-h-[200px]">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="sticky top-0 bg-gray-100">
-            <tr className="text-black">
-              <th className="border border-gray-300 p-2">Room</th>
-              <th className="border border-gray-300 p-2">Department</th>
-              <th className="border border-gray-300 p-2">Type</th>
-              <th className="border border-gray-300 p-2">Capacity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rooms.length > 0 ? (
-              rooms.map((room) => (
-                <tr key={room.room_id} className="text-black">
-                  <td className="border border-gray-300 p-2">{room.room_id}</td>
-                  <td className="border border-gray-300 p-2">{room.departments.name}</td>
-                  <td className="border border-gray-300 p-2">{room.room_type}</td>
-                  <td className="border border-gray-300 p-2">{room.capacity}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="border border-gray-300 p-2 text-center" colSpan={4}>
-                  No rooms available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg font-bold flex items-center gap-2">
+          <DoorOpen className="h-5 w-5 text-muted-foreground" />
+          Room Availability
+        </CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">
+          Currently available rooms
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="px-0">
+        <div className="overflow-auto max-h-[200px]">
+          <Table>
+            <TableHeader className="sticky top-0 bg-muted">
+              <TableRow>
+                <TableHead>Room</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Capacity</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rooms.length > 0 ? (
+                rooms.map((room) => (
+                  <TableRow key={room.room_id}>
+                    <TableCell>{room.room_id}</TableCell>
+                    <TableCell>{room.departments.name}</TableCell>
+                    <TableCell>{room.room_type}</TableCell>
+                    <TableCell>{room.capacity}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-4">
+                    No rooms available
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
