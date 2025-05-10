@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PatientInfoCard from '@/components/patient/patient-info-card'
 import AppointmentCalendarCard from '@/components/patient/appointment-calendar-card'
 import UpcomingAppointmentsTable from '@/components/patient/upcoming-appointments-table'
@@ -29,43 +29,41 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      
-      try {
-        const [patientResponse, appointmentsResponse, billingResponse] = await Promise.all([
-          fetch('/api/patients/me'),
-          fetch('/api/appointments'),
-          fetch('/api/billing/patient/me'),
-        ])
+  const fetchData = useCallback(async () => {
+    try {
+      const [patientResponse, appointmentsResponse, billingResponse] = await Promise.all([
+        fetch('/api/patients/me'),
+        fetch('/api/appointments'),
+        fetch('/api/billing/patient/me'),
+      ])
 
-        if (!patientResponse.ok) {
-          throw new Error('Failed to fetch patient profile')
-        }
-        if (!appointmentsResponse.ok) {
-          throw new Error('Failed to fetch appointments')
-        }
-
-        const patientData = await patientResponse.json()
-        const appointmentsData = await appointmentsResponse.json()
-        const billingData = await billingResponse.json()
-
-        setPatientProfile(patientData)
-        setAppointments(appointmentsData)
-        setBilling(billingData)
-      } catch (err) {
-        setError('An error occurred while fetching data')
-      } finally {
-        setLoading(false)
+      if (!patientResponse.ok) {
+        throw new Error('Failed to fetch patient profile')
       }
-    }
+      if (!appointmentsResponse.ok) {
+        throw new Error('Failed to fetch appointments')
+      }
 
-    fetchData()
+      const patientData = await patientResponse.json()
+      const appointmentsData = await appointmentsResponse.json()
+      const billingData = await billingResponse.json()
+
+      setPatientProfile(patientData)
+      setAppointments(appointmentsData)
+      setBilling(billingData)
+    } catch (err) {
+      setError('An error occurred while fetching data')
+    } finally {
+      setLoading(false)
+    }
   }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Failed to load data: {error}</div>
-
 
   return (
     <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
@@ -75,7 +73,7 @@ export default function PatientDashboard() {
         </h1>
       </header>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PatientInfoCard patientProfile={patientProfile} />
+        <PatientInfoCard patientProfile={patientProfile} refreshData={fetchData} />
         <AppointmentCalendarCard appointments={appointments}/>
         <UpcomingAppointmentsTable appointments={appointments} />
       </section>
