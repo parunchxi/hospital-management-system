@@ -22,22 +22,40 @@ export const signUpAction = async (formData: FormData) => {
 
   const supabase = await createClient()
   const origin = (await headers()).get('origin')
-
+  console.log(formData)
   if (
-    !first_name ||
-    !last_name ||
-    !date_of_birth ||
-    !gender ||
-    !national_id ||
-    !address ||
-    !phone_number ||
-    !email ||
-    !password ||
-    !confirm_password ||
-    !blood_type ||
-    !emergency_contact
+    !first_name?.trim() ||
+    !last_name?.trim() ||
+    !date_of_birth?.trim() ||
+    !gender?.trim() ||
+    !national_id?.toString().trim() ||
+    !address?.trim() ||
+    !phone_number?.toString().trim() ||
+    !email?.trim() ||
+    !password?.trim() ||
+    !confirm_password?.trim() ||
+    !blood_type?.trim() ||
+    !emergency_contact?.trim()
   ) {
-    return encodedRedirect('error', '/sign-up', 'All fields are required')
+    const missingFields = []
+    if (!first_name?.trim()) missingFields.push('First Name')
+    if (!last_name?.trim()) missingFields.push('Last Name')
+    if (!date_of_birth?.trim()) missingFields.push('Date of Birth')
+    if (!gender?.trim()) missingFields.push('Gender')
+    if (!national_id?.toString().trim()) missingFields.push('National ID')
+    if (!address?.trim()) missingFields.push('Address')
+    if (!phone_number?.toString().trim()) missingFields.push('Phone Number')
+    if (!email?.trim()) missingFields.push('Email')
+    if (!password?.trim()) missingFields.push('Password')
+    if (!confirm_password?.trim()) missingFields.push('Confirm Password')
+    if (!blood_type?.trim()) missingFields.push('Blood Type')
+    if (!emergency_contact?.trim()) missingFields.push('Emergency Contact')
+
+    return encodedRedirect(
+      'error',
+      '/sign-up',
+      `The following fields are required: ${missingFields.join(', ')}`
+    )
   }
 
   if (password !== confirm_password) {

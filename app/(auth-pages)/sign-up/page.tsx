@@ -65,6 +65,7 @@ function Signup({ message }: { message?: Message }) {
 
   const watchDate = form.watch('date_of_birth')
   const watchGender = form.watch('gender')
+  const watchBloodType = form.watch('blood_type')
 
   return (
     <div className="w-full flex flex-col items-center justify-start min-h-screen">
@@ -160,6 +161,7 @@ function Signup({ message }: { message?: Message }) {
               value={watchDate ? format(watchDate, 'yyyy-MM-dd') : ''}
             />
             <input type="hidden" name="gender" value={watchGender} />
+            <input type="hidden" name="blood_type" value={watchBloodType || ''} />
 
             <Label htmlFor="national_id">National ID</Label>
             <Input
