@@ -82,7 +82,7 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
     setError(null); // Clear any previous errors
 
     try {
-      const res = await fetch("/api/medicine-dispense", {
+      const res = await fetch("/api/medicine/dispense", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ record_id: Number(record_id), medicine_id: Number(medicine_id), quantity: Number(quantity) }),
