@@ -6,8 +6,8 @@ import AppointmentsTable from '@/components/doctor/appointments-table'
 import MedicineStockTable from '@/components/doctor/medicine-stock-table'
 import RoomAvailabilityTable from '@/components/doctor/free-rooms'
 import DoctorInfoCard from '@/components/doctor/doctor-info'
-import DoctorCalendar from '@/components/doctor/calendar'
 import FloatingActionMenu from '@/components/doctor/floating-action-menu'
+import DoctorCalendar from '@/components/doctor/calendar'
 
 // Define proper interface for patient records
 interface PatientRecord {
