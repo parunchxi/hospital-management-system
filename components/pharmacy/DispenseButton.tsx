@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
-import { toast } from "@/components/patient/use-toast";
+import { Loader2, FlaskConical, Search } from "lucide-react";
+import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DispenseButtonProps {
   onDispenseSuccess?: () => Promise<void>;
@@ -51,6 +52,7 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
   const [selectedMedicineDetails, setSelectedMedicineDetails] = useState<Medicine | null>(null);
   const [selectedRecordDetails, setSelectedRecordDetails] = useState<Record | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (isDialogOpen) {
@@ -74,11 +76,7 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
       const data = await res.json();
       setRecords(data);
     } catch (err: any) {
-      toast({
-        title: "Error",
-        description: `Error fetching records: ${err.message}`,
-        variant: "destructive"
-      });
+      toast.error(`Error fetching records: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -94,11 +92,7 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
       const data = await res.json();
       setMedicines(data);
     } catch (err: any) {
-      toast({
-        title: "Error",
-        description: `Error fetching medicines: ${err.message}`,
-        variant: "destructive"
-      });
+      toast.error(`Error fetching medicines: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -142,19 +136,11 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
         const errorData = await res.json();
         throw new Error(errorData.error || "Dispense failed");
       }
-      toast({
-        title: "Success",
-        description: "Medicine dispensed successfully!",
-        variant: "default"
-      });
+      toast.success("Medicine dispensed successfully!");
       setIsDialogOpen(false);
       onDispenseSuccess?.();
     } catch (err: any) {
-      toast({
-        title: "Error",
-        description: `Error dispensing medicine: ${err.message}`,
-        variant: "destructive"
-      });
+      toast.error(`Error dispensing medicine: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -177,27 +163,55 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
     setSelectedRecordDetails(selected || null);
   };
 
+  const filteredRecords = records.filter(record => {
+    const patientName = `${record.patients.users.first_name} ${record.patients.users.last_name}`.toLowerCase();
+    const recordId = String(record.record_id);
+    return patientName.includes(searchTerm.toLowerCase()) || recordId.includes(searchTerm);
+  });
+
   return (
     <>
       <Button 
         onClick={() => setIsDialogOpen(true)} 
-        className="bg-green-600 text-white hover:bg-green-700 transition-colors"
+        className="bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2"
         variant="default"
+        size="lg"
       >
+        <FlaskConical className="h-5 w-5" />
         Dispense Medicine
       </Button>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-center">Dispense Medicine</DialogTitle>
-            <p className="text-muted-foreground text-center text-sm">
+            <DialogTitle className="text-xl font-semibold">Dispense Medicine</DialogTitle>
+            <DialogDescription>
               Select a patient record and medicine to dispense
-            </p>
+            </DialogDescription>
           </DialogHeader>
           
           <Separator className="my-2" />
           
           <div className="space-y-5 py-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="record-search" className="text-sm font-medium">
+                  Search Patient Records
+                </Label>
+                {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
+              </div>
+              <div className="flex items-center border rounded-md px-3 py-2">
+                <Search className="h-4 w-4 text-muted-foreground mr-2" />
+                <Input
+                  id="record-search"
+                  placeholder="Search by patient name or ID..."
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <Label htmlFor="record-select" className="text-sm font-medium">
                 Patient Record
@@ -211,11 +225,13 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
                   <SelectValue placeholder="Select Record ID" />
                 </SelectTrigger>
                 <SelectContent>
-                  {records.map((record) => (
-                    <SelectItem key={record.record_id} value={record.record_id}>
-                      {record.patients.users.first_name} {record.patients.users.last_name} (ID: {record.record_id})
-                    </SelectItem>
-                  ))}
+                  <ScrollArea className="h-[200px]">
+                    {filteredRecords.map((record) => (
+                      <SelectItem key={record.record_id} value={record.record_id}>
+                        {record.patients.users.first_name} {record.patients.users.last_name} (ID: {record.record_id})
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
                 </SelectContent>
               </Select>
             </div>
@@ -275,11 +291,13 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
                   <SelectValue placeholder="Select Medicine" />
                 </SelectTrigger>
                 <SelectContent>
-                  {medicines.map((medicine) => (
-                    <SelectItem key={medicine.medicine_id} value={medicine.medicine_id}>
-                      {medicine.name} ({medicine.quantity} {medicine.unit}s available)
-                    </SelectItem>
-                  ))}
+                  <ScrollArea className="h-[200px]">
+                    {medicines.map((medicine) => (
+                      <SelectItem key={medicine.medicine_id} value={medicine.medicine_id}>
+                        {medicine.name} ({medicine.quantity} {medicine.unit}s available)
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
                 </SelectContent>
               </Select>
             </div>
@@ -361,7 +379,8 @@ export default function DispenseButton({ onDispenseSuccess }: DispenseButtonProp
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
                 </>
               ) : (
                 'Dispense Medicine'
