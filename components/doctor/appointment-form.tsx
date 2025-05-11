@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { PatientSearch } from './PatientSearch'
+import { PatientSearch } from './patient-search'
 import {
   Calendar,
   ClipboardList,

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 import { createClient } from '@/utils/supabase/server'
 
 // GET /api/admin/staff → List all staff by type

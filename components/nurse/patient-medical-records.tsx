@@ -24,7 +24,7 @@ import {
   User,
   AlertCircle,
 } from 'lucide-react'
-import { ButtonIcon } from '@/components/ui/editBtn'
+import { ButtonIcon } from '@/components/ui/edit-btn'
 import {
   Dialog,
   DialogContent,

@@ -43,7 +43,7 @@ export function PatientPersonalInfo({ patientInfo }: PatientPersonalInfoProps) {
                 ? new Date(
                     patientInfo.users?.date_of_birth,
                   ).toLocaleDateString()
-                : 'N/A'}
+                : 'N/a'}
             </span>
           </div>
           <div className="flex flex-col">

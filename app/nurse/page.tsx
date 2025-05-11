@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { PatientDetailsDialog } from '@/components/nurse/patient-details-dialog'
-import AssignedPatientsTable from '@/components/nurse/AssignedPatientsTable'
-import NurseInfoCard from '@/components/nurse/NurseInfo'
+import AssignedPatientsTable from '@/components/nurse/assigned-patients-table'
+import NurseInfoCard from '@/components/nurse/nurse-info'
 
 export default function NurseDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false)

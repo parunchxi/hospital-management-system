@@ -1,7 +1,7 @@
 // app/api/appointments/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 // Allowed ENUM values (adjust based on your database definitions)
 const validVisitStatuses = ['Scheduled', 'Completed', 'Cancelled']

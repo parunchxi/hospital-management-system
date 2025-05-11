@@ -1,7 +1,7 @@
 // /api/staff/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 // GET /api/staff → get all staff
 // GET /api/staff?type=Doctor → filter by type

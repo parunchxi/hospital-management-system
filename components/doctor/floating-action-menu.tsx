@@ -26,8 +26,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Toaster } from 'sonner'
-import { AdmissionForm } from './AdmissionForm'
-import { AppointmentForm } from './AppointmentForm'
+import { AdmissionForm } from './admission-form'
+import { AppointmentForm } from './appointment-form'
 import {
   Table,
   TableBody,

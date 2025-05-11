@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
-import { use } from 'react'
+import { getUserRole } from '@/utils/get-role'
 
 export async function GET(
   req: Request,

@@ -14,7 +14,7 @@ import {
   Calendar,
   Contact,
 } from 'lucide-react'
-import { ButtonIcon } from '@/components/ui/editBtn'
+import { ButtonIcon } from '@/components/ui/edit-btn'
 import { useState } from 'react'
 import {
   Dialog,
@@ -176,7 +176,7 @@ export default function PatientInfoCard({
               <Contact className="h-4 w-4" />
               <span>
                 Emergency Contact ID:{' '}
-                {patientProfile?.emergency_contact_id ?? 'N/A'}
+                {patientProfile?.emergency_contact_id ?? 'N/a'}
               </span>
             </div>
           </div>

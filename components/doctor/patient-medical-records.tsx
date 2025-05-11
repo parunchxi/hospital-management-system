@@ -24,14 +24,14 @@ import {
   User,
   AlertCircle,
 } from 'lucide-react'
-import { ButtonIcon } from '@/components/ui/editBtn'
+import { ButtonIcon } from '@/components/ui/edit-btn'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import RecordForm from './RecordForm'
+import RecordForm from './record-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface MedicalRecord {

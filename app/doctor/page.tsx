@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react'
 import { PatientDetailsDialog } from '@/components/doctor/patient-details-dialog'
-import AppointmentsTable from '@/components/doctor/AppointmentsTable'
-import MedicineStockTable from '@/components/doctor/MedicineStockTable'
-import RoomAvailabilityTable from '@/components/doctor/FreeRooms'
-import DoctorInfoCard from '@/components/doctor/DoctorInfo'
-import DoctorCalendar from '@/components/doctor/Calendar'
-import FloatingActionMenu from '@/components/doctor/FloatingActionMenu'
+import AppointmentsTable from '@/components/doctor/appointments-table'
+import MedicineStockTable from '@/components/doctor/medicine-stock-table'
+import RoomAvailabilityTable from '@/components/doctor/free-rooms'
+import DoctorInfoCard from '@/components/doctor/doctor-info'
+import DoctorCalendar from '@/components/doctor/calendar'
+import FloatingActionMenu from '@/components/doctor/floating-action-menu'
 
 // Define proper interface for patient records
 interface PatientRecord {

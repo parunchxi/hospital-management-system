@@ -1,11 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Toaster } from 'sonner'
-import PharmacyBanner from '@/components/pharmacy/PharmacyBanner'
-import MedicineStockGrid from '@/components/pharmacy/MedicineStockGrid'
-import LowStockSection from '@/components/pharmacy/LowStockSection'
-import OutOfStockSection from '@/components/pharmacy/OutOfStockSection'
-import DispenseButton from '@/components/pharmacy/DispenseButton'
+import PharmacyBanner from '@/components/pharmacy/pharmacy-banner'
+import MedicineStockGrid from '@/components/pharmacy/medicine-stock-grid'
+import LowStockSection from '@/components/pharmacy/low-stock-section'
+import OutOfStockSection from '@/components/pharmacy/out-of-stock-section'
+import DispenseButton from '@/components/pharmacy/dispense-button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,

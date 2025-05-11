@@ -128,12 +128,14 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
 
   useEffect(() => {
     if (!isDialogOpen) return
+
     fetch('/api/rooms')
       .then((res) => res.json())
       .then((data) => setRooms(Array.isArray(data) ? data : []))
     fetch('/api/staff?type=Nurse')
       .then((res) => res.json())
       .then((data) => setNurses(Array.isArray(data) ? data : []))
+
     // Reset form with current admission info
     if (admissionInfo) {
       let nurseId = ''
@@ -151,7 +153,7 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
         discharge_date: admissionInfo.discharge_date || '',
       })
     }
-  }, [isDialogOpen, admissionInfo])
+  }, [isDialogOpen, admissionInfo, nurses, form])
 
   // PATCH handler
   const onSubmit = async (values: any) => {

@@ -1,7 +1,7 @@
 // app/api/staff/me/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 const validStaffTypes = ['Doctor', 'Nurse', 'Admin', 'Pharmacist']
 

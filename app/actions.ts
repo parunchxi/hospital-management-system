@@ -4,7 +4,7 @@ import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 export const signUpAction = async (formData: FormData) => {
   const first_name = formData.get('first_name')?.toString()

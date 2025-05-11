@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { PatientSearch } from './PatientSearch'
+import { PatientSearch } from './patient-search'
 import { Hospital, Calendar, User } from 'lucide-react'
 
 interface AdmissionFormProps {

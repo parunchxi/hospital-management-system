@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 import { NextRequest, NextResponse } from 'next/server'
 
 const validStaffTypes = ['Doctor', 'Nurse', 'Pharmacist', 'Admin']
