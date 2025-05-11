@@ -15,10 +15,31 @@ import {
   FileText,
   Loader2,
   AlertCircle,
+  User,
 } from 'lucide-react'
 import AdmissionDetails from './admission-details'
 import PatientPersonalInfo from './patient-personal-info'
 import PatientMedicalRecords from './patient-medical-records'
+
+interface MedicalRecord {
+  record_id?: string
+  visit_date: string
+  visit_status: string
+  patient_status: string
+  doctor_id: number | {
+    users?: {
+      first_name: string
+      last_name: string
+    }
+  }
+  diagnosis?: string
+  treatment?: string
+  notes?: string
+  symptoms?: string
+  prescription?: string
+  treatment_plan?: string
+  medicine_prescribed?: string
+}
 
 interface Patient {
   id?: string
@@ -40,22 +61,7 @@ interface Patient {
     national_id: string
   }
   blood_type?: string
-  medical_records?: Array<{
-    record_id?: string
-    visit_date: string
-    visit_status: string
-    doctor_id?: {
-      users?: {
-        first_name: string
-        last_name: string
-      }
-    }
-    diagnosis?: string
-    treatment?: string
-    notes?: string
-    symptoms?: string
-    prescription?: string
-  }>
+  medical_records?: MedicalRecord[]
 }
 
 interface PatientDetailsDialogProps {
@@ -73,6 +79,15 @@ export function PatientDetailsDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Reset state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setPatientInfo(null)
+      setError(null)
+    }
+  }, [open]);
+
+  // Fetch patient data when dialog opens
   useEffect(() => {
     async function fetchPatientData() {
       if (!open || !patient) {
@@ -80,7 +95,6 @@ export function PatientDetailsDialog({
       }
 
       const patientId = patient.patient_id;
-
       if (!patientId) {
         console.error("Cannot find patient ID in:", patient);
         setError("Cannot find patient ID in appointment data")
@@ -92,7 +106,6 @@ export function PatientDetailsDialog({
       setError(null)
 
       try {
-        // Fetch patient data
         const patientResponse = await fetch(`/api/patients/${patientId}`)
 
         if (!patientResponse.ok) {
@@ -110,52 +123,54 @@ export function PatientDetailsDialog({
     }
 
     fetchPatientData()
-
-    // Clean up state when dialog closes
-    return () => {
-      if (!open) {
-        setPatientInfo(null)
-        setError(null)
-      }
-    }
   }, [open, patient])
 
   if (!patient) return null
+
+  // Prepare medical records with proper typing for the PatientMedicalRecords component
+  const preparedMedicalRecords = patientInfo?.medical_records?.map(record => ({
+    ...record,
+    // Ensure doctor_id is a number as expected by PatientMedicalRecords
+    doctor_id: typeof record.doctor_id === 'number' ? record.doctor_id : -1,
+  })) ?? [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
-            <FileText className="h-5 w-5 text-muted-foreground" />
+            <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Patient Information
           </DialogTitle>
           <DialogDescription>
             {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+              <div className="flex items-center gap-2" aria-live="polite">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Loading patient details...
               </div>
             ) : error ? (
-              <div className="flex items-center gap-2 text-destructive">
-                <AlertCircle className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-destructive" role="alert">
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 {error}
               </div>
             ) : (
-              <span>Patient ID: {patientInfo?.patient_id || "Unknown"}</span>
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" aria-hidden="true" />
+                <span>Patient ID: {patientInfo?.patient_id || "Unknown"}</span>
+              </div>
             )}
           </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
-            Loading patient information...
+          <div className="flex justify-center py-8" aria-live="polite">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" aria-hidden="true" />
+            <p>Loading patient information...</p>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center gap-2 text-destructive py-8">
-            <AlertCircle className="h-5 w-5" />
-            Failed to load patient data: {error}
+          <div className="flex items-center justify-center gap-2 text-destructive py-8 bg-destructive/10 rounded-md p-3" role="alert">
+            <AlertCircle className="h-5 w-5" aria-hidden="true" />
+            <p>Failed to load patient data: {error}</p>
           </div>
         ) : patientInfo ? (
           <Tabs defaultValue="personal" className="w-full">
@@ -170,7 +185,7 @@ export function PatientDetailsDialog({
             </TabsContent>
 
             <TabsContent value="medical" className="space-y-4 mt-4">
-              <PatientMedicalRecords medicalRecords={patientInfo.medical_records} />
+              <PatientMedicalRecords medicalRecords={preparedMedicalRecords} />
             </TabsContent>
 
             <TabsContent value="admission" className="space-y-4 mt-4">
@@ -183,7 +198,11 @@ export function PatientDetailsDialog({
         ) : null}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            aria-label="Close patient details dialog"
+          >
             Close
           </Button>
         </DialogFooter>

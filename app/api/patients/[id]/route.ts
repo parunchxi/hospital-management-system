@@ -21,7 +21,7 @@ export async function GET(
     const { data: patient, error } = await supabase
         .from('patients')
         .select(`*, users( national_id,first_name,last_name,date_of_birth,phone_number,address),
-            medical_records(visit_date, visit_status, doctor_id (users(first_name,last_name)))`)
+            medical_records(record_id, visit_date, visit_status, doctor_id (users(first_name,last_name)))`)
         .eq('patient_id', patientId)
         .single();
     console.log('Patient data:', patient); 

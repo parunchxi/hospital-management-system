@@ -19,7 +19,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   
   const { data, error } = await supabase
     .from('medical_records')  
-    .select('*')
+    .select(`*,
+      medical_staff: doctor_id (
+        users (
+          first_name,
+          last_name
+          ))`)
     .eq('record_id', rec_id)  
     .single();
 

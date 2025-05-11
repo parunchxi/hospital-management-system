@@ -111,7 +111,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
                     key={record.record_id}
                     className="cursor-pointer"
                     onClick={() => {
-                        alert(`Row clicked, patient data: ${JSON.stringify(record, null, 2)}`);
+                        // alert(`Row clicked, patient data: ${JSON.stringify(record, null, 2)}`);
                       onRowClick(record);
                     }}
                   >
