@@ -108,6 +108,27 @@ export async function POST(req: Request) {
     )
   }
 
+  // VALIDAATE patient is not already admitted
+  const { data: existingAdmission, error: existingAdmissionError } = await supabase
+    .from('admissions')
+    .select('admission_id')
+    .eq('patient_id', patient_id)
+    .eq('discharge_date', null)
+    .single()
+  if (existingAdmissionError) {
+    console.error('Error checking existing admission:', existingAdmissionError)
+    return NextResponse.json(
+      { error: 'Failed to check existing admission' },
+      { status: 500 },
+    )
+  }
+  if (existingAdmission) {
+    return NextResponse.json(
+      { error: 'Patient is already admitted' },
+      { status: 400 },
+    )
+  }    
+
   // Insert into admissions table
   const { data, error } = await supabase
     .from('admissions')
