@@ -9,7 +9,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });  
   }
   const { role } = result;
-  if (role !== 'Doctor' && role !== 'Admin') {
+  if (role !== 'Doctor' && role !== 'Admin' && role !== 'Nurse') {
     return NextResponse.json({ error: 'Only doctors can view medical records' }, { status: 403 });  // Only doctors can view medical records
   }
 
