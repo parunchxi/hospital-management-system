@@ -113,9 +113,10 @@ export async function POST(req: Request) {
     .from('admissions')
     .select('admission_id')
     .eq('patient_id', patient_id)
-    .eq('discharge_date', null)
+    .is('discharge_date', null)
     .single()
-  if (existingAdmissionError) {
+
+  if (existingAdmissionError && existingAdmissionError.code !== 'PGRST116') { // Ignore "No rows found" error
     console.error('Error checking existing admission:', existingAdmissionError)
     return NextResponse.json(
       { error: 'Failed to check existing admission' },
