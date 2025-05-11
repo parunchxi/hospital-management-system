@@ -1,10 +1,6 @@
-// app/api/admin/staff/route.ts
 import { NextResponse } from 'next/server'
 import { getUserRole } from '@/utils/getRoles'
 import { createClient } from '@/utils/supabase/server'
-
-const validStaffTypes = ['Doctor', 'Nurse', 'Pharmacist', 'Admin']
-const validEmploymentStatus = ['Active', 'On_Leave', 'Resigned', 'Retired']
 
 // GET /api/admin/staff → List all staff by type
 export async function GET(req: Request) {
