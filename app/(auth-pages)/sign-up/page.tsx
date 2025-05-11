@@ -40,6 +40,7 @@ import { cn } from '@/lib/utils'
 const SignupSchema = z.object({
   date_of_birth: z.date({ required_error: 'Date of birth is required' }),
   gender: z.string().min(1, 'Gender is required'),
+  blood_type: z.string().min(1, 'Blood type is required'),
 })
 
 export default function SignupWrapper(props: {
@@ -64,6 +65,7 @@ function Signup({ message }: { message?: Message }) {
 
   const watchDate = form.watch('date_of_birth')
   const watchGender = form.watch('gender')
+  const watchBloodType = form.watch('blood_type')
 
   return (
     <div className="w-full flex flex-col items-center justify-start min-h-screen">
@@ -159,6 +161,7 @@ function Signup({ message }: { message?: Message }) {
               value={watchDate ? format(watchDate, 'yyyy-MM-dd') : ''}
             />
             <input type="hidden" name="gender" value={watchGender} />
+            <input type="hidden" name="blood_type" value={watchBloodType || ''} />
 
             <Label htmlFor="national_id">National ID</Label>
             <Input
@@ -209,22 +212,33 @@ function Signup({ message }: { message?: Message }) {
               required
             />
 
-            <Label htmlFor="blood_type">Blood Type</Label>
-            <Select name="blood_type" required>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Blood Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="A+">A+</SelectItem>
-                <SelectItem value="A-">A-</SelectItem>
-                <SelectItem value="B+">B+</SelectItem>
-                <SelectItem value="B-">B-</SelectItem>
-                <SelectItem value="AB+">AB+</SelectItem>
-                <SelectItem value="AB-">AB-</SelectItem>
-                <SelectItem value="O+">O+</SelectItem>
-                <SelectItem value="O-">O-</SelectItem>
-              </SelectContent>
-            </Select>
+            <FormField
+              control={form.control}
+              name="blood_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Blood Type</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Blood Type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="A+">A+</SelectItem>
+                      <SelectItem value="A-">A-</SelectItem>
+                      <SelectItem value="B+">B+</SelectItem>
+                      <SelectItem value="B-">B-</SelectItem>
+                      <SelectItem value="AB+">AB+</SelectItem>
+                      <SelectItem value="AB-">AB-</SelectItem>
+                      <SelectItem value="O+">O+</SelectItem>
+                      <SelectItem value="O-">O-</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldMessage />
+                </FormItem>
+              )}
+            />
 
             <Label htmlFor="emergency_contact">Emergency Contact</Label>
             <Input

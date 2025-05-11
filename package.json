@@ -15,11 +15,14 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
+    "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-checkbox": "^1.2.3",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-dropdown-menu": "^2.1.12",
     "@radix-ui/react-label": "^2.1.4",
     "@radix-ui/react-popover": "^1.1.11",
+    "@radix-ui/react-progress": "^1.1.6",
+    "@radix-ui/react-scroll-area": "^1.2.8",
     "@radix-ui/react-select": "^2.2.2",
     "@radix-ui/react-separator": "^1.1.6",
     "@radix-ui/react-slot": "^1.2.2",
@@ -40,6 +43,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.56.1",
     "recharts": "^2.15.3",
+    "sonner": "^2.0.3",
     "zod": "^3.24.4"
   },
   "devDependencies": {
