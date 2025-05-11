@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('patients')
-    .select('users(national_id, first_name, last_name, date_of_birth, phone_number, address), blood_type, emergency_contact_id')
+    .select('patient_id, users(national_id, first_name, last_name, date_of_birth, phone_number, address), blood_type, emergency_contact_id')
 
   if (error || !data) {
     console.error('Fetch patient error:', error?.message || error)
