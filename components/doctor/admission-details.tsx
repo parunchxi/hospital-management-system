@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useForm } from 'react-hook-form'
-import { useToast } from '@/components/ui/use-toast'
+import { toast, Toaster } from 'sonner'
 
 interface AdmissionInfo {
   admission_id?: string
@@ -78,7 +78,6 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
   const [admissionInfo, setAdmissionInfo] = useState<AdmissionInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [nurses, setNurses] = useState<NurseInfo[]>([]);
@@ -158,7 +157,7 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
         }),
       });
       if (!res.ok) throw new Error('Failed to update admission');
-      toast({ title: 'Success', description: 'Admission updated.' });
+      toast.success('Admission updated successfully');
       setIsDialogOpen(false);
       // Refresh admission info
       setIsLoading(true);
@@ -167,7 +166,7 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
         .then(data => setAdmissionInfo(Array.isArray(data) && data.length > 0 ? data[0] : data))
         .finally(() => setIsLoading(false));
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast.error(e.message || 'Error updating admission');
     } finally {
       setIsSubmitting(false);
     }
@@ -197,47 +196,48 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
     : null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-          <Heart className="h-4 w-4 text-muted-foreground" />
-          Admission Details
-        </CardTitle>
-        {hasAdmissionData && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 ml-2"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Edit admission details</span>
-          </Button>
-        )}
-        {/* Debug output - remove in production */}
-        <div className="text-xs text-gray-400 mt-1 break-all hidden">
-          {JSON.stringify(admissionInfo)}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="flex justify-center items-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground mr-2" />
-            <span className="text-muted-foreground">Loading admission details...</span>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Heart className="h-4 w-4 text-muted-foreground" />
+            Admission Details
+          </CardTitle>
+          {hasAdmissionData && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 ml-2"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">Edit admission details</span>
+            </Button>
+          )}
+          {/* Debug output - remove in production */}
+          <div className="text-xs text-gray-400 mt-1 break-all hidden">
+            {JSON.stringify(admissionInfo)}
           </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <AlertCircle className="h-5 w-5 text-muted-foreground mb-2" />
-            <span className="text-muted-foreground text-sm">{error}</span>
-          </div>
-        ) : hasAdmissionData ? (
-          <div className="space-y-3">
-            {displayRoomId && displayRoomId !== "Unknown" && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Room ID:</span>
-                <Badge variant="outline">{displayRoomId}</Badge>
-              </div>
-            )}
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground mr-2" />
+              <span className="text-muted-foreground">Loading admission details...</span>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <AlertCircle className="h-5 w-5 text-muted-foreground mb-2" />
+              <span className="text-muted-foreground text-sm">{error}</span>
+            </div>
+          ) : hasAdmissionData ? (
+            <div className="space-y-3">
+              {displayRoomId && displayRoomId !== "Unknown" && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Room ID:</span>
+                  <Badge variant="outline">{displayRoomId}</Badge>
+                </div>
+              )}
 
             {displayRoomType && (
               <div className="flex justify-between items-center">
@@ -284,118 +284,120 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
               </div>
             )}
 
-            {admissionInfo.nurse?.user && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Assigned Nurse:</span>
-                <span className="text-sm">
-                  {admissionInfo.nurse.user.first_name} {admissionInfo.nurse.user.last_name}
-                </span>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <span className="text-muted-foreground text-sm">Patient is not currently admitted</span>
-          </div>
-        )}
-      </CardContent>
-      {/* Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Pencil className="h-4 w-4" />
-              Edit Admission Details
-            </DialogTitle>
-            <DialogDescription>
-              Update the room, nurse, and discharge date for this admission.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="room_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Hospital className="h-4 w-4 opacity-70" />
-                      Room
-                    </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+              {admissionInfo.nurse?.user && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Assigned Nurse:</span>
+                  <span className="text-sm">
+                    {admissionInfo.nurse.user.first_name} {admissionInfo.nurse.user.last_name}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <span className="text-muted-foreground text-sm">Patient is not currently admitted</span>
+            </div>
+          )}
+        </CardContent>
+        {/* Edit Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Pencil className="h-4 w-4" />
+                Edit Admission Details
+              </DialogTitle>
+              <DialogDescription>
+                Update the room, nurse, and discharge date for this admission.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="room_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Hospital className="h-4 w-4 opacity-70" />
+                        Room
+                      </FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a room" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {rooms.map(room => (
+                            <SelectItem key={room.room_id} value={room.room_id}>
+                              {room.room_id} - {room.room_type} ({room.department?.name})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="nurse_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <User className="h-4 w-4 opacity-70" />
+                        Nurse
+                      </FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a nurse" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {nurses.map(nurse => (
+                            <SelectItem key={nurse.staff_id} value={nurse.staff_id}>
+                              {nurse.users.first_name} {nurse.users.last_name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="discharge_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 opacity-70" />
+                        Discharge Date
+                      </FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a room" />
-                        </SelectTrigger>
+                        <Input type="date" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {rooms.map(room => (
-                          <SelectItem key={room.room_id} value={room.room_id}>
-                            {room.room_id} - {room.room_type} ({room.department?.name})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="nurse_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <User className="h-4 w-4 opacity-70" />
-                      Nurse
-                    </FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a nurse" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {nurses.map(nurse => (
-                          <SelectItem key={nurse.staff_id} value={nurse.staff_id}>
-                            {nurse.users.first_name} {nurse.users.last_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="discharge_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 opacity-70" />
-                      Discharge Date
-                    </FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Save'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </Card>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Save'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </Card>
+      <Toaster />
+    </>
   );
 };
 
