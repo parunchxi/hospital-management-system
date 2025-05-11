@@ -11,11 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import {
-  FileText,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react'
+import { FileText, Loader2, AlertCircle } from 'lucide-react'
 import PatientPersonalInfo from './patient-personal-info'
 import PatientMedicalRecords from './patient-medical-records'
 
@@ -72,17 +68,32 @@ export function PatientDetailsDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Function to transform medical records to match expected format
+  const transformMedicalRecords = (records?: Array<any>) => {
+    if (!records) return undefined
+    return records.map((record) => ({
+      ...record,
+      // Add missing fields with default values
+      patient_status: record.patient_status || 'Unknown',
+      diagnosis: record.diagnosis || '',
+      treatment: record.treatment || '',
+      notes: record.notes || '',
+      symptoms: record.symptoms || '',
+      prescription: record.prescription || '',
+    }))
+  }
+
   useEffect(() => {
     async function fetchPatientData() {
       if (!open || !patient) {
         return
       }
 
-      const patientId = patient.patient_id;
+      const patientId = patient.patient_id
 
       if (!patientId) {
-        console.error("Cannot find patient ID in:", patient);
-        setError("Cannot find patient ID in appointment data")
+        console.error('Cannot find patient ID in:', patient)
+        setError('Cannot find patient ID in appointment data')
         setIsLoading(false)
         return
       }
@@ -95,14 +106,16 @@ export function PatientDetailsDialog({
         const patientResponse = await fetch(`/api/patients/${patientId}`)
 
         if (!patientResponse.ok) {
-          throw new Error(`Failed to fetch patient data: ${patientResponse.status}`)
+          throw new Error(
+            `Failed to fetch patient data: ${patientResponse.status}`,
+          )
         }
 
         const patientData = await patientResponse.json()
         setPatientInfo(patientData)
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error occurred")
-        console.error("Error fetching patient data:", err)
+        setError(err instanceof Error ? err.message : 'Unknown error occurred')
+        console.error('Error fetching patient data:', err)
       } finally {
         setIsLoading(false)
       }
@@ -141,7 +154,7 @@ export function PatientDetailsDialog({
                 {error}
               </div>
             ) : (
-              <span>Patient ID: {patientInfo?.patient_id || "Unknown"}</span>
+              <span>Patient ID: {patientInfo?.patient_id || 'Unknown'}</span>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -168,9 +181,12 @@ export function PatientDetailsDialog({
             </TabsContent>
 
             <TabsContent value="medical" className="space-y-4 mt-4">
-              <PatientMedicalRecords medicalRecords={patientInfo.medical_records} />
+              <PatientMedicalRecords
+                medicalRecords={transformMedicalRecords(
+                  patientInfo.medical_records,
+                )}
+              />
             </TabsContent>
-
           </Tabs>
         ) : null}
 

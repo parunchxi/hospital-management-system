@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import { PatientSearch } from './PatientSearch';
+  SelectValue,
+} from '@/components/ui/select'
+import { PatientSearch } from './patient-search'
 import {
   Calendar,
   ClipboardList,
@@ -20,20 +20,22 @@ import {
   FileText,
   Pill,
   CheckCircle,
-  UserCheck
-} from 'lucide-react';
+  UserCheck,
+} from 'lucide-react'
 
 interface AppointmentFormProps {
-  patientIdInput: string;
-  handlePatientIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  fetchingPatient: boolean;
-  patientError: string;
-  appointmentPatient: any;
-  appointment: any;
-  handleAppointmentChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  setAppointment: (value: React.SetStateAction<any>) => void;
-  loading: boolean;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
+  patientIdInput: string
+  handlePatientIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  fetchingPatient: boolean
+  patientError: string
+  appointmentPatient: any
+  appointment: any
+  handleAppointmentChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void
+  setAppointment: (value: React.SetStateAction<any>) => void
+  loading: boolean
+  onSubmit: (e: React.FormEvent) => Promise<void>
 }
 
 export const AppointmentForm: React.FC<AppointmentFormProps> = ({
@@ -47,35 +49,36 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   setAppointment,
   loading,
   onSubmit,
-}) => {  // Visit status options
-  const visitStatusOptions = ['Scheduled', 'Completed', 'Canceled'];
+}) => {
+  // Visit status options
+  const visitStatusOptions = ['Scheduled', 'Completed', 'Canceled']
   // Patient status options
-  const patientStatusOptions = ['Outpatient', 'Inpatient'];  // State for medicines
-  const [medicines, setMedicines] = useState<any[]>([]);
-  const [loadingMedicines, setLoadingMedicines] = useState(false);
+  const patientStatusOptions = ['Outpatient', 'Inpatient'] // State for medicines
+  const [medicines, setMedicines] = useState<any[]>([])
+  const [loadingMedicines, setLoadingMedicines] = useState(false)
 
   // Fetch medicines on component mount
   useEffect(() => {
     const fetchMedicines = async () => {
-      setLoadingMedicines(true);
+      setLoadingMedicines(true)
       try {
-        const res = await fetch('/api/medicine');
-        if (!res.ok) throw new Error('Failed to fetch medicines');
-        const data = await res.json();
-        setMedicines(data);
+        const res = await fetch('/api/medicine')
+        if (!res.ok) throw new Error('Failed to fetch medicines')
+        const data = await res.json()
+        setMedicines(data)
       } catch (error) {
-        console.error('Error fetching medicines:', error);
+        console.error('Error fetching medicines:', error)
       } finally {
-        setLoadingMedicines(false);
+        setLoadingMedicines(false)
       }
-    };
+    }
 
-    fetchMedicines();
-  }, []);
+    fetchMedicines()
+  }, [])
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <Card className='max-h-[65vh] overflow-y-auto'>
+      <Card className="max-h-[65vh] overflow-y-auto">
         <CardContent className="pt-4 space-y-4">
           <PatientSearch
             patientId={patientIdInput}
@@ -88,7 +91,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
           <Separator className="my-2" />
 
           <div className="space-y-2">
-            <Label htmlFor="visit-date" className="text-sm font-medium flex items-center gap-2">
+            <Label
+              htmlFor="visit-date"
+              className="text-sm font-medium flex items-center gap-2"
+            >
               <Calendar className="h-4 w-4 text-muted-foreground" />
               Appointment Date
             </Label>
@@ -105,13 +111,21 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="visit-status" className="text-sm font-medium flex items-center gap-2">
+              <Label
+                htmlFor="visit-status"
+                className="text-sm font-medium flex items-center gap-2"
+              >
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 Visit Status
               </Label>
               <Select
                 value={appointment.visit_status}
-                onValueChange={(val: string) => setAppointment((prev: typeof appointment) => ({ ...prev, visit_status: val }))}
+                onValueChange={(val: string) =>
+                  setAppointment((prev: typeof appointment) => ({
+                    ...prev,
+                    visit_status: val,
+                  }))
+                }
               >
                 <SelectTrigger id="visit-status">
                   <SelectValue placeholder="Scheduled" />
@@ -127,13 +141,21 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="patient-status" className="text-sm font-medium flex items-center gap-2">
+              <Label
+                htmlFor="patient-status"
+                className="text-sm font-medium flex items-center gap-2"
+              >
                 <UserCheck className="h-4 w-4 text-muted-foreground" />
                 Patient Status
               </Label>
               <Select
                 value={appointment.patient_status}
-                onValueChange={(val: string) => setAppointment((prev: typeof appointment) => ({ ...prev, patient_status: val }))}
+                onValueChange={(val: string) =>
+                  setAppointment((prev: typeof appointment) => ({
+                    ...prev,
+                    patient_status: val,
+                  }))
+                }
               >
                 <SelectTrigger id="patient-status">
                   <SelectValue placeholder="Outpatient" />
@@ -152,7 +174,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
           <Separator className="my-2" />
 
           <div className="space-y-2">
-            <Label htmlFor="symptoms" className="text-sm font-medium flex items-center gap-2">
+            <Label
+              htmlFor="symptoms"
+              className="text-sm font-medium flex items-center gap-2"
+            >
               <ClipboardList className="h-4 w-4 text-muted-foreground" />
               Symptoms
             </Label>
@@ -167,7 +192,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="diagnosis" className="text-sm font-medium flex items-center gap-2">
+            <Label
+              htmlFor="diagnosis"
+              className="text-sm font-medium flex items-center gap-2"
+            >
               <Stethoscope className="h-4 w-4 text-muted-foreground" />
               Diagnosis
             </Label>
@@ -181,7 +209,10 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="treatment-plan" className="text-sm font-medium flex items-center gap-2">
+            <Label
+              htmlFor="treatment-plan"
+              className="text-sm font-medium flex items-center gap-2"
+            >
               <FileText className="h-4 w-4 text-muted-foreground" />
               Treatment Plan
             </Label>
@@ -241,5 +272,5 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
         {loading ? 'Creating...' : 'Create Appointment'}
       </Button>
     </form>
-  );
-};
+  )
+}

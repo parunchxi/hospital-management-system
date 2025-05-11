@@ -19,12 +19,12 @@ import {
 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 
-interface NurseInfoCardProps {
+interface DoctorInfoCardProps {
   type?: 'name'
 }
 
-const NurseInfoCard: React.FC<NurseInfoCardProps> = ({ type }) => {
-  const [nurse, setNurse] = useState<any>(null)
+const DoctorInfoCard: React.FC<DoctorInfoCardProps> = ({ type }) => {
+  const [doctor, setDoctor] = useState<any>(null)
   const [isLoading, setLoading] = useState(true)
   const [notes, setNotes] = useState('')
 
@@ -32,13 +32,13 @@ const NurseInfoCard: React.FC<NurseInfoCardProps> = ({ type }) => {
     fetch('/api/staff/me')
       .then((res) => res.json())
       .then((data) => {
-        setNurse(data)
+        setDoctor(data)
         setLoading(false)
       })
       .catch(() => setLoading(false))
 
     // Load notes from localStorage when component mounts
-    const savedNotes = localStorage.getItem('nurseNotes')
+    const savedNotes = localStorage.getItem('doctorNotes')
     if (savedNotes) {
       setNotes(savedNotes)
     }
@@ -47,26 +47,28 @@ const NurseInfoCard: React.FC<NurseInfoCardProps> = ({ type }) => {
   // Save notes to localStorage whenever they change
   useEffect(() => {
     if (notes !== undefined) {
-      localStorage.setItem('nurseNotes', notes)
+      localStorage.setItem('doctorNotes', notes)
     }
   }, [notes])
 
-  if (isLoading) return type === 'name' ? <span>Loading...</span> : <div>Loading...</div>
-  if (!nurse) return type === 'name' ? <span>No data</span> : <div>No profile data</div>
+  if (isLoading)
+    return type === 'name' ? <span>Loading...</span> : <div>Loading...</div>
+  if (!doctor)
+    return type === 'name' ? <span>No data</span> : <div>No profile data</div>
 
   if (type === 'name') {
-    return <span>{nurse.users.first_name}</span>
+    return <span>{doctor.users.first_name}</span>
   }
 
   return (
-    <Card >
+    <Card>
       <CardHeader>
         <CardTitle className="text-lg font-bold flex items-center gap-2">
           <User2 className="h-5 w-5 text-muted-foreground" />
-          Nurse Profile
+          Doctor Profile
         </CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
-        Nurse profile details
+          Doctor profile details
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 text-sm text-muted-foreground">
@@ -74,34 +76,42 @@ const NurseInfoCard: React.FC<NurseInfoCardProps> = ({ type }) => {
           <div className="flex items-center gap-2">
             <User2 className="h-4 w-4" />
             <span className="font-medium">
-              {nurse.users.first_name} {nurse.users.last_name}
+              {doctor.users.first_name} {doctor.users.last_name}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Phone className="h-4 w-4" />
-            <span>{nurse.users.phone_number}</span>
+            <span>{doctor.users.phone_number}</span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            <span>{nurse.users.date_of_birth}</span>
+            <span>{doctor.users.date_of_birth}</span>
           </div>
         </div>
         <div className="pt-2 border-t border-gray-100">
           <div className="flex items-center gap-2 mt-2">
             <BadgeCheck className="h-4 w-4" />
-            <span><strong>Staff ID:</strong> {nurse.staff_id}</span>
+            <span>
+              <strong>Staff ID:</strong> {doctor.staff_id}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <GraduationCap className="h-4 w-4" />
-            <span><strong>License:</strong> {nurse.license_number}</span>
+            <span>
+              <strong>License:</strong> {doctor.license_number}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <Building2 className="h-4 w-4" />
-            <span><strong>Department:</strong> {nurse.departments.name}</span>
+            <span>
+              <strong>Department:</strong> {doctor.departments.name}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <Briefcase className="h-4 w-4" />
-            <span><strong>Joined:</strong> {nurse.date_hired}</span>
+            <span>
+              <strong>Joined:</strong> {doctor.date_hired}
+            </span>
           </div>
         </div>
 
@@ -117,12 +127,11 @@ const NurseInfoCard: React.FC<NurseInfoCardProps> = ({ type }) => {
             placeholder="Write your notes here..."
             className="min-h-[100px] w-full"
           />
-          <p className="text-xs text-muted-foreground mt-1">
-          </p>
+          <p className="text-xs text-muted-foreground mt-1"></p>
         </div>
       </CardContent>
     </Card>
   )
 }
 
-export default NurseInfoCard
+export default DoctorInfoCard

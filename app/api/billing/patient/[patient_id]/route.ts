@@ -1,28 +1,28 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getUserRole } from '@/utils/getRoles';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { getUserRole } from '@/utils/get-role'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+)
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ patient_id: string }> }   
+  { params }: { params: Promise<{ patient_id: string }> },
 ) {
-  const { patient_id } = await params;
-  const patientId = Number(patient_id);
+  const { patient_id } = await params
+  const patientId = Number(patient_id)
   if (isNaN(patientId)) {
-    return NextResponse.json({ error: 'Invalid patient_id' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid patient_id' }, { status: 400 })
   }
 
-  const userRole = await getUserRole();
+  const userRole = await getUserRole()
   if (!userRole) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   /* Only Admin or the patient themselves */
@@ -33,17 +33,24 @@ export async function GET(
       .from('patients')
       .select('patient_id')
       .eq('user_id', userRole.userId)
-      .single();
+      .single()
     if (!pRow || pRow.patient_id !== patientId) {
-      return NextResponse.json({ error: 'You do not have permission.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'You do not have permission.' },
+        { status: 403 },
+      )
     }
   } else {
-    return NextResponse.json({ error: 'You do not have permission.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'You do not have permission.' },
+      { status: 403 },
+    )
   }
 
   const { data, error } = await supabase
     .from('billing')
-    .select(`
+    .select(
+      `
       bill_id,
       total_price,
       status,
@@ -58,13 +65,14 @@ export async function GET(
         unit_price,
         total_price
       )
-    `)
+    `,
+    )
     .eq('patient_id', patientId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(data)
 }

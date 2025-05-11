@@ -14,7 +14,7 @@ import {
   Calendar,
   Contact,
 } from 'lucide-react'
-import { ButtonIcon } from '@/components/ui/editBtn'
+import { ButtonIcon } from '@/components/ui/edit-btn'
 import { useState } from 'react'
 import {
   Dialog,
@@ -53,7 +53,9 @@ export default function PatientInfoCard({
   const [newPhoneNumber, setNewPhoneNumber] = useState(user?.phone_number || '')
   const [validationError, setValidationError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(user?.phone_number || '')
+  const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(
+    user?.phone_number || '',
+  )
 
   const handleEditClick = () => {
     setIsDialogOpen(true)
@@ -174,7 +176,7 @@ export default function PatientInfoCard({
               <Contact className="h-4 w-4" />
               <span>
                 Emergency Contact ID:{' '}
-                {patientProfile?.emergency_contact_id ?? 'N/A'}
+                {patientProfile?.emergency_contact_id ?? 'N/a'}
               </span>
             </div>
           </div>

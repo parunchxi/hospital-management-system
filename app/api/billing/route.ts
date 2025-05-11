@@ -46,25 +46,29 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null) as
-    | { patient_id?: number; total_price?: number }
-    | null;
+  const body = (await req.json().catch(() => null)) as {
+    patient_id?: number
+    total_price?: number
+  } | null
 
   if (!body || typeof body.patient_id !== 'number') {
     return NextResponse.json(
       { error: 'Body must include numeric patient_id' },
-      { status: 400 }
-    );
+      { status: 400 },
+    )
   }
 
-  const totalPrice = typeof body.total_price === 'number' ? body.total_price : 0;
+  const totalPrice = typeof body.total_price === 'number' ? body.total_price : 0
 
-  const userRole = await getUserRole();
+  const userRole = await getUserRole()
   if (!userRole) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   if (userRole.role !== 'Admin') {
-    return NextResponse.json({ error: 'You do not have permission.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'You do not have permission.' },
+      { status: 403 },
+    )
   }
 
   const { data, error } = await supabase
@@ -72,25 +76,25 @@ export async function POST(req: NextRequest) {
     .insert(
       [
         {
-          patient_id : body.patient_id,
-          total_price: totalPrice,     // can be 0 – you’ll update later
-          status     : 'Pending'
-        }
+          patient_id: body.patient_id,
+          total_price: totalPrice, // can be 0 – you’ll update later
+          status: 'Pending',
+        },
       ],
-      { defaultToNull: false }        // ensures defaults (created_at etc.) populate
+      { defaultToNull: false }, // ensures defaults (created_at etc.) populate
     )
     .select('bill_id')
-    .single();
+    .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
   return NextResponse.json(
     {
       message: 'Billing record created.',
-      bill_id: data.bill_id
+      bill_id: data.bill_id,
     },
-    { status: 201 }
-  );
+    { status: 201 },
+  )
 }

@@ -1,53 +1,55 @@
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getUserRole } from '@/utils/getRoles';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { getUserRole } from '@/utils/get-role'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+)
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ record_id: string }> }
+  { params }: { params: Promise<{ record_id: string }> },
 ) {
-  const { record_id } = await params;
-  const recordId = Number(record_id);
+  const { record_id } = await params
+  const recordId = Number(record_id)
 
   if (isNaN(recordId)) {
-    return NextResponse.json({ error: 'Invalid record_id' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid record_id' }, { status: 400 })
   }
 
-  const userRole = await getUserRole();          // ← ส่ง req เข้าไป
+  const userRole = await getUserRole() // ← ส่ง req เข้าไป
   if (!userRole) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   if (!['Doctor', 'Pharmacist', 'Admin'].includes(userRole.role)) {
     return NextResponse.json(
       { error: 'Forbidden: Insufficient role' },
-      { status: 403 }
-    );
+      { status: 403 },
+    )
   }
 
   const { data, error } = await supabase
     .from('medicine_dispense')
-    .select(`
+    .select(
+      `
       dispense_id,
       quantity,
       dispense_date,
       medicine_stock(name),
       pharmacist_id
-    `)
+    `,
+    )
     .eq('record_id', recordId)
-    .order('dispense_date', { ascending: false });
+    .order('dispense_date', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(data)
 }

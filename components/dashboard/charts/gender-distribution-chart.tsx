@@ -1,6 +1,19 @@
 import * as React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts'
 
 interface GenderDistributionChartProps {
   data: { name: string; value: number }[]
@@ -10,56 +23,63 @@ interface GenderDistributionChartProps {
 const COLORS = {
   Male: 'hsl(var(--chart-1))',
   Female: 'hsl(var(--chart-2))',
-  Other: 'hsl(var(--chart-3))'
-};
+  Other: 'hsl(var(--chart-3))',
+}
 
-export function GenderDistributionChart({ data }: GenderDistributionChartProps) {
+export function GenderDistributionChart({
+  data,
+}: GenderDistributionChartProps) {
   // Filter out zero values for better visualization
-  const filteredData = data.filter(item => item.value > 0);
-  
+  const filteredData = data.filter((item) => item.value > 0)
+
   // Calculate total for percentage
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-  
+  const total = data.reduce((sum, item) => sum + item.value, 0)
+
   // Generate stats for each gender
-  const stats = data.map(item => ({
+  const stats = data.map((item) => ({
     name: item.name,
     value: item.value,
-    percentage: total > 0 ? (item.value / total) * 100 : 0
-  }));
-  
+    percentage: total > 0 ? (item.value / total) * 100 : 0,
+  }))
+
   // Custom label formatter
-  const renderCustomizedLabel = ({ 
-    cx, cy, midAngle, innerRadius, outerRadius, percent 
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
   }: any) => {
-    if (percent < 0.05) return null;
-    
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    
+    if (percent < 0.05) return null
+
+    const RADIAN = Math.PI / 180
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.6
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor="middle" 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor="middle"
         dominantBaseline="central"
         fontSize={12}
         fontWeight="bold"
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
-    );
-  };
+    )
+  }
 
   // Custom tooltip - Fixed to calculate percentage on the fly
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
-      const item = payload[0].payload;
+      const item = payload[0].payload
       // Calculate percentage directly to avoid undefined errors
-      const itemPercentage = total > 0 ? (item.value / total) * 100 : 0;
-      
+      const itemPercentage = total > 0 ? (item.value / total) * 100 : 0
+
       return (
         <div className="bg-background border rounded-md p-2 shadow-sm">
           <p className="font-medium text-sm">{item.name}</p>
@@ -67,10 +87,10 @@ export function GenderDistributionChart({ data }: GenderDistributionChartProps) 
             Count: {item.value} ({itemPercentage.toFixed(1)}%)
           </p>
         </div>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <Card className="h-full">
@@ -98,7 +118,10 @@ export function GenderDistributionChart({ data }: GenderDistributionChartProps) 
                     {filteredData.map((entry) => (
                       <Cell
                         key={`cell-${entry.name}`}
-                        fill={COLORS[entry.name as keyof typeof COLORS] || 'hsl(var(--muted))'}
+                        fill={
+                          COLORS[entry.name as keyof typeof COLORS] ||
+                          'hsl(var(--muted))'
+                        }
                       />
                     ))}
                   </Pie>
@@ -108,17 +131,27 @@ export function GenderDistributionChart({ data }: GenderDistributionChartProps) 
             </div>
             <div className="flex flex-col justify-center">
               {stats.map((item) => (
-                <div key={item.name} className="flex items-center justify-between mb-2">
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between mb-2"
+                >
                   <div className="flex items-center">
                     <div
                       className="w-3 h-3 rounded-full mr-2"
-                      style={{ backgroundColor: COLORS[item.name as keyof typeof COLORS] || 'hsl(var(--muted))' }}
+                      style={{
+                        backgroundColor:
+                          COLORS[item.name as keyof typeof COLORS] ||
+                          'hsl(var(--muted))',
+                      }}
                     />
                     <span className="text-sm">{item.name}</span>
                   </div>
                   <div className="text-sm">
                     <span className="font-medium">{item.value}</span>
-                    <span className="text-muted-foreground"> ({item.percentage.toFixed(0)}%)</span>
+                    <span className="text-muted-foreground">
+                      {' '}
+                      ({item.percentage.toFixed(0)}%)
+                    </span>
                   </div>
                 </div>
               ))}

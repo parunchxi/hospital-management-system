@@ -8,7 +8,7 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 const validRoomTypes = ['General', 'ICU', 'Private', 'Emergency']
 
 export async function GET(req: Request) {

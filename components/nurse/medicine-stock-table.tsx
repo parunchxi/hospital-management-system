@@ -38,22 +38,24 @@ const MedicineStockTable: React.FC = () => {
       })
   }, [])
 
-  if (isLoading) return (
-    <Card>
-      <CardContent className="p-6 flex justify-center items-center">
-        Loading medicine stock...
-      </CardContent>
-    </Card>
-  )
+  if (isLoading)
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center">
+          Loading medicine stock...
+        </CardContent>
+      </Card>
+    )
 
-  if (error) return (
-    <Card>
-      <CardContent className="p-6 flex justify-center items-center text-destructive gap-2">
-        <AlertCircle className="h-5 w-5" />
-        {error}
-      </CardContent>
-    </Card>
-  )
+  if (error)
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center text-destructive gap-2">
+          <AlertCircle className="h-5 w-5" />
+          {error}
+        </CardContent>
+      </Card>
+    )
 
   return (
     <Card>
@@ -77,33 +79,43 @@ const MedicineStockTable: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {medicineStock.length > 0 ? medicineStock.map((medicine) => {
-                let status = 'OK'
-                let variant = 'outline'
+              {medicineStock.length > 0 ? (
+                medicineStock.map((medicine) => {
+                  let status = 'OK'
+                  let variant = 'outline'
 
-                if (medicine.quantity === 0) {
-                  status = 'Out of Stock'
-                  variant = 'destructive'
-                } else if (medicine.quantity < medicine.min_stock_level) {
-                  status = 'Low'
-                  variant = 'warning'
-                }
+                  if (medicine.quantity === 0) {
+                    status = 'Out of Stock'
+                    variant = 'destructive'
+                  } else if (medicine.quantity < medicine.min_stock_level) {
+                    status = 'Low'
+                    variant = 'warning'
+                  }
 
-                return (
-                  <TableRow key={medicine.id || medicine.medicine_id}>
-                    <TableCell>{medicine.name}</TableCell>
-                    <TableCell className="text-center">{medicine.quantity}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        variant={status === 'Low' ? 'outline' : variant as any}
-                        className={status === 'Low' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' : ''}
-                      >
-                        {status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                )
-              }) : (
+                  return (
+                    <TableRow key={medicine.id || medicine.medicine_id}>
+                      <TableCell>{medicine.name}</TableCell>
+                      <TableCell className="text-center">
+                        {medicine.quantity}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={
+                            status === 'Low' ? 'outline' : (variant as any)
+                          }
+                          className={
+                            status === 'Low'
+                              ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                              : ''
+                          }
+                        >
+                          {status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              ) : (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center py-4">
                     No medicine stock available

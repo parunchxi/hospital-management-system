@@ -2,26 +2,25 @@
 
 import React, { useState, useEffect } from 'react'
 import { PatientDetailsDialog } from '@/components/nurse/patient-details-dialog'
-import AssignedPatientsTable from '@/components/nurse/AssignedPatientsTable'
-import NurseInfoCard from '@/components/nurse/NurseInfo'
+import AssignedPatientsTable from '@/components/nurse/assigned-patients-table'
+import NurseInfoCard from '@/components/nurse/nurse-info'
 
 export default function NurseDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<any>(null)
   const [nurseName, setNurseName] = useState<string>('')
-  
+
   useEffect(() => {
     // Fetch nurse name for greeting
     fetch('/api/staff/me')
-
-      .then(res => {
+      .then((res) => {
         if (res.ok) return res.json()
         return { users: { first_name: 'Nurse' } }
       })
-      .then(data => {
+      .then((data) => {
         setNurseName(data.users?.first_name || 'Nurse')
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error fetching nurse info:', err)
       })
   }, [])
@@ -50,7 +49,11 @@ export default function NurseDashboard() {
           </div>
         </section>
 
-        <PatientDetailsDialog open={dialogOpen} onOpenChange={setDialogOpen} patient={selectedPatient} />
+        <PatientDetailsDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          patient={selectedPatient}
+        />
       </div>
     </>
   )

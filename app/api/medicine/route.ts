@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
 export async function GET(req: NextRequest) {
@@ -16,7 +16,10 @@ export async function GET(req: NextRequest) {
 
   const allowedRoles = ['Doctor', 'Pharmacist', 'Admin']
   if (!allowedRoles.includes(userRole.role)) {
-    return NextResponse.json({ error: 'Forbidden: Insufficient role' }, { status: 403 })
+    return NextResponse.json(
+      { error: 'Forbidden: Insufficient role' },
+      { status: 403 },
+    )
   }
 
   const { data, error } = await supabase.from('medicine_stock').select('*')

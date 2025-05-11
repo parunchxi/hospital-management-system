@@ -24,15 +24,15 @@ import {
   User,
   AlertCircle,
 } from 'lucide-react'
-import { ButtonIcon } from '@/components/ui/editBtn'
+import { ButtonIcon } from '@/components/ui/edit-btn'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import RecordForm from './RecordForm'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import RecordForm from './record-form'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface MedicalRecord {
   record_id?: string | number
@@ -66,47 +66,49 @@ interface PatientMedicalRecordsProps {
 // Helper functions extracted for cleaner component code
 const formatDate = (dateString: string) => {
   try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
   } catch (e) {
-    return dateString;
+    return dateString
   }
 }
 
 const getStatusVariant = (status: string) => {
-  if (!status) return 'default';
-  
-  const statusLower = status.toLowerCase();
-  if (statusLower === 'completed') return 'success';
-  if (statusLower === 'scheduled') return 'secondary';
-  if (statusLower === 'cancelled') return 'destructive';
-  return 'default';
+  if (!status) return 'default'
+
+  const statusLower = status.toLowerCase()
+  if (statusLower === 'completed') return 'success'
+  if (statusLower === 'scheduled') return 'secondary'
+  if (statusLower === 'cancelled') return 'destructive'
+  return 'default'
 }
 
 const getDoctorName = (record: MedicalRecord) => {
   if (record.medical_staff?.users) {
-    return `Dr. ${record.medical_staff.users.first_name} ${record.medical_staff.users.last_name}`;
+    return `Dr. ${record.medical_staff.users.first_name} ${record.medical_staff.users.last_name}`
   }
-  return typeof record.doctor_id === 'number' ? `Doctor ID: ${record.doctor_id}` : 'Unknown Doctor';
+  return typeof record.doctor_id === 'number'
+    ? `Doctor ID: ${record.doctor_id}`
+    : 'Unknown Doctor'
 }
 
 // Extracted component for record details
-function RecordDetails({ 
-  record, 
-  isLoading, 
-  error, 
+function RecordDetails({
+  record,
+  isLoading,
+  error,
   onClose,
-  onEdit 
-}: { 
-  record: MedicalRecord, 
-  isLoading: boolean, 
-  error: string | null,
-  onClose: () => void,
-  onEdit: () => void 
+  onEdit,
+}: {
+  record: MedicalRecord
+  isLoading: boolean
+  error: string | null
+  onClose: () => void
+  onEdit: () => void
 }) {
   return (
     <Card className="mb-4 border border-primary/20 shadow-md">
@@ -118,7 +120,9 @@ function RecordDetails({
             </CardTitle>
             <CardDescription>
               {formatDate(record.visit_date)} -{' '}
-              <Badge variant={getStatusVariant(record.visit_status)}>{record.visit_status}</Badge>
+              <Badge variant={getStatusVariant(record.visit_status)}>
+                {record.visit_status}
+              </Badge>
             </CardDescription>
           </div>
           <Button
@@ -135,12 +139,21 @@ function RecordDetails({
 
       <CardContent className="space-y-4 text-sm pt-4">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-4" aria-live="polite">
-            <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" aria-hidden="true" />
+          <div
+            className="flex flex-col items-center justify-center py-4"
+            aria-live="polite"
+          >
+            <Loader2
+              className="h-6 w-6 animate-spin text-primary mb-2"
+              aria-hidden="true"
+            />
             <p>Loading record details...</p>
           </div>
         ) : error ? (
-          <div className="text-destructive bg-destructive/10 p-3 rounded-md flex items-center gap-2" role="alert">
+          <div
+            className="text-destructive bg-destructive/10 p-3 rounded-md flex items-center gap-2"
+            role="alert"
+          >
             <AlertCircle className="h-4 w-4" />
             <p>Error: {error}</p>
           </div>
@@ -148,7 +161,9 @@ function RecordDetails({
           <Tabs defaultValue="details">
             <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="treatment">Treatment & Medication</TabsTrigger>
+              <TabsTrigger value="treatment">
+                Treatment & Medication
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="details" className="space-y-4 pt-4">
@@ -176,7 +191,9 @@ function RecordDetails({
                   <h4 className="text-sm font-medium mb-1 text-muted-foreground">
                     Symptoms
                   </h4>
-                  <p className="p-2 bg-muted/20 rounded-md">{record.symptoms}</p>
+                  <p className="p-2 bg-muted/20 rounded-md">
+                    {record.symptoms}
+                  </p>
                 </div>
               )}
 
@@ -186,17 +203,21 @@ function RecordDetails({
                     <Stethoscope className="h-3.5 w-3.5" aria-hidden="true" />
                     Diagnosis
                   </h4>
-                  <p className="p-2 bg-muted/20 rounded-md">{record.diagnosis}</p>
+                  <p className="p-2 bg-muted/20 rounded-md">
+                    {record.diagnosis}
+                  </p>
                 </div>
               )}
-              
+
               {record.created_at && (
                 <div>
                   <h4 className="text-sm font-medium mb-1 flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
                     Record Created
                   </h4>
-                  <p className="text-xs text-muted-foreground">{formatDate(record.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(record.created_at)}
+                  </p>
                 </div>
               )}
             </TabsContent>
@@ -247,8 +268,12 @@ function RecordDetails({
   )
 }
 
-export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsProps) {
-  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
+export function PatientMedicalRecords({
+  medicalRecords,
+}: PatientMedicalRecordsProps) {
+  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(
+    null,
+  )
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isLoadingRecord, setIsLoadingRecord] = useState(false)
   const [recordError, setRecordError] = useState<string | null>(null)
@@ -273,7 +298,9 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
     } catch (error) {
       console.error('Failed to fetch record details:', error)
       setRecordError(
-        error instanceof Error ? error.message : 'Failed to load record details'
+        error instanceof Error
+          ? error.message
+          : 'Failed to load record details',
       )
     } finally {
       setIsLoadingRecord(false)
@@ -304,7 +331,8 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
         symptoms: updatedRecord.symptoms,
         diagnosis: updatedRecord.diagnosis,
         treatment_plan: updatedRecord.treatment || updatedRecord.treatment_plan,
-        medicine_prescribed: updatedRecord.prescription || updatedRecord.medicine_prescribed,
+        medicine_prescribed:
+          updatedRecord.prescription || updatedRecord.medicine_prescribed,
       }
 
       const response = await fetch(
@@ -313,7 +341,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(apiData),
-        }
+        },
       )
 
       if (!response.ok) {
@@ -323,16 +351,17 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
 
       // Close form first
       setIsFormOpen(false)
-      
+
       // Re-fetch record data to ensure we have the latest version
       if (updatedRecord.record_id) {
         fetchRecordDetails(updatedRecord.record_id)
       }
-
     } catch (error) {
       console.error('Error updating record:', error)
       // Set error for component display
-      setRecordError(error instanceof Error ? error.message : 'Failed to update record')
+      setRecordError(
+        error instanceof Error ? error.message : 'Failed to update record',
+      )
     }
   }
 
@@ -347,7 +376,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
       <CardContent>
         <div className="space-y-4">
           {selectedRecord && (
-            <RecordDetails 
+            <RecordDetails
               record={selectedRecord}
               isLoading={isLoadingRecord}
               error={recordError}
@@ -368,29 +397,29 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                        <Calendar
+                          className="h-3.5 w-3.5 text-primary"
+                          aria-hidden="true"
+                        />
                         <span className="font-medium">
                           {formatDate(record.visit_date)}
                         </span>
                       </div>
-                      <Badge
-                        variant={getStatusVariant(record.visit_status)}
-                      >
+                      <Badge variant={getStatusVariant(record.visit_status)}>
                         {record.visit_status}
                       </Badge>
                     </div>
+
                     <div className="flex justify-between items-center mt-1.5">
                       <div className="text-muted-foreground">
-                        {record.medical_staff?.users ? (
-                          <span>Dr. {record.medical_staff.users.first_name} {record.medical_staff.users.last_name}</span>
-                        ) : (
-                          <span>Patient Status: {record.patient_status}</span>
-                        )}
+                        <span>Record ID: {record.record_id}</span>
                       </div>
                       {record.diagnosis && (
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Stethoscope className="h-3 w-3" aria-hidden="true" />
-                          <span className="max-w-[150px] truncate">{record.diagnosis}</span>
+                          <span className="max-w-[150px] truncate">
+                            {record.diagnosis}
+                          </span>
                         </span>
                       )}
                     </div>
@@ -422,7 +451,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
       </Dialog>
 
       {recordError && !isFormOpen && (
-        <div 
+        <div
           className="fixed bottom-4 right-4 bg-destructive text-white p-3 rounded shadow-lg"
           role="alert"
           aria-live="assertive"
@@ -431,10 +460,10 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
             <AlertCircle className="h-4 w-4" />
             {recordError}
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="absolute top-1 right-1 text-white" 
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute top-1 right-1 text-white"
             onClick={() => setRecordError(null)}
             aria-label="Dismiss error"
           >

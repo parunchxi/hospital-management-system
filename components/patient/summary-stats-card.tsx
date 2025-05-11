@@ -2,27 +2,27 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { CalendarDays, Receipt, Wallet, Stethoscope } from 'lucide-react'
 
 interface BillingItem {
-  item_id: number;
-  quantity: number;
-  item_type: string;
-  unit_price: number;
-  description: string;
-  item_id_ref: number;
-  total_price: number;
+  item_id: number
+  quantity: number
+  item_type: string
+  unit_price: number
+  description: string
+  item_id_ref: number
+  total_price: number
 }
 
 interface Billing {
-  bill_id: number;
-  total_price: number;
-  status: 'Paid' | 'Pending';
-  created_at: string;
-  updated_at: string;
-  billing_items: BillingItem[];
+  bill_id: number
+  total_price: number
+  status: 'Paid' | 'Pending'
+  created_at: string
+  updated_at: string
+  billing_items: BillingItem[]
 }
 
 interface Props {
-  appointments: { status: string }[];
-  billing: Billing[];
+  appointments: { status: string }[]
+  billing: Billing[]
 }
 
 export default function SummaryStatsCard({ appointments, billing }: Props) {

@@ -1,6 +1,22 @@
 import * as React from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 interface RevenueOverTimeChartProps {
@@ -9,24 +25,32 @@ interface RevenueOverTimeChartProps {
 
 export function RevenueOverTimeChart({ data }: RevenueOverTimeChartProps) {
   // Calculate statistics
-  const totalRevenue = data.reduce((sum, item) => sum + item.total, 0);
-  const averageRevenue = totalRevenue / data.length;
-  
+  const totalRevenue = data.reduce((sum, item) => sum + item.total, 0)
+  const averageRevenue = totalRevenue / data.length
+
   // Calculate trend (compare last two days)
-  const sortedData = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const lastDayRevenue = sortedData.length > 0 ? sortedData[sortedData.length - 1].total : 0;
-  const previousDayRevenue = sortedData.length > 1 ? sortedData[sortedData.length - 2].total : lastDayRevenue;
-  const percentChange = previousDayRevenue !== 0 ? 
-    ((lastDayRevenue - previousDayRevenue) / previousDayRevenue) * 100 : 0;
-  
+  const sortedData = [...data].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  )
+  const lastDayRevenue =
+    sortedData.length > 0 ? sortedData[sortedData.length - 1].total : 0
+  const previousDayRevenue =
+    sortedData.length > 1
+      ? sortedData[sortedData.length - 2].total
+      : lastDayRevenue
+  const percentChange =
+    previousDayRevenue !== 0
+      ? ((lastDayRevenue - previousDayRevenue) / previousDayRevenue) * 100
+      : 0
+
   // Format currency
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
       currency: 'THB',
-      maximumFractionDigits: 0
-    }).format(value);
-  };
+      maximumFractionDigits: 0,
+    }).format(value)
+  }
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -38,13 +62,15 @@ export function RevenueOverTimeChart({ data }: RevenueOverTimeChartProps) {
             {formatCurrency(payload[0].value)}
           </p>
           <p className="text-xs text-muted-foreground">
-            {payload[0].value > averageRevenue ? 'Above average' : 'Below average'}
+            {payload[0].value > averageRevenue
+              ? 'Above average'
+              : 'Below average'}
           </p>
         </div>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <Card className="h-full">
@@ -60,25 +86,35 @@ export function RevenueOverTimeChart({ data }: RevenueOverTimeChartProps) {
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Daily Average</p>
-            <p className="text-2xl font-bold">{formatCurrency(averageRevenue)}</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(averageRevenue)}
+            </p>
           </div>
         </div>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                <stop
+                  offset="5%"
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="hsl(var(--primary))"
+                  stopOpacity={0}
+                />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 11 }}
             />
-            <YAxis 
+            <YAxis
               tickFormatter={(value) => formatCurrency(value)}
               tick={{ fontSize: 11 }}
               axisLine={false}
@@ -86,17 +122,17 @@ export function RevenueOverTimeChart({ data }: RevenueOverTimeChartProps) {
               width={80}
             />
             <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine 
-              y={averageRevenue} 
-              stroke="hsl(var(--muted-foreground))" 
-              strokeDasharray="3 3" 
+            <ReferenceLine
+              y={averageRevenue}
+              stroke="hsl(var(--muted-foreground))"
+              strokeDasharray="3 3"
             />
             <Line
               type="monotone"
               dataKey="total"
               stroke="hsl(var(--primary))"
               strokeWidth={2}
-              dot={{ fill: "hsl(var(--primary))", r: 4 }}
+              dot={{ fill: 'hsl(var(--primary))', r: 4 }}
               activeDot={{ r: 6 }}
               fillOpacity={0.2}
               fill="url(#colorRevenue)"

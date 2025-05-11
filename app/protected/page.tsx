@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { InfoIcon } from 'lucide-react'
 import { redirect } from 'next/navigation'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 export default async function ProtectedPage() {
   const supabase = await createClient()

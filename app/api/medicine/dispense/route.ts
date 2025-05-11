@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
 export async function POST(req: NextRequest) {
@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
   const { record_id, medicine_id, quantity } = body
 
   if (!record_id || !medicine_id || !quantity) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    )
   }
 
   // ✅ Get user role from session
@@ -21,8 +24,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!['Doctor', 'Pharmacist','Admin'].includes(userRole.role)) {
-    return NextResponse.json({ error: 'Only doctors and pharmacists can dispense' }, { status: 403 })
+  if (!['Doctor', 'Pharmacist', 'Admin'].includes(userRole.role)) {
+    return NextResponse.json(
+      { error: 'Only doctors and pharmacists can dispense' },
+      { status: 403 },
+    )
   }
 
   // ✅ Look up staff_id from user_id
@@ -33,7 +39,10 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (staffLookupError || !staffRow) {
-    return NextResponse.json({ error: 'Staff not found for this user' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Staff not found for this user' },
+      { status: 400 },
+    )
   }
 
   // ✅ Check medicine stock
@@ -48,20 +57,25 @@ export async function POST(req: NextRequest) {
   }
 
   if (medicine.quantity < quantity) {
-    return NextResponse.json({ error: 'Not enough stock available' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Not enough stock available' },
+      { status: 400 },
+    )
   }
 
   // ✅ Insert dispense record
-  const { error: insertError } = await supabase.from('medicine_dispense').insert([
-    {
-      record_id,
-      pharmacist_id: staffRow.staff_id, // ✅ this is now defined
-      medicine_id,
-      quantity,
-      dispense_date: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ])
+  const { error: insertError } = await supabase
+    .from('medicine_dispense')
+    .insert([
+      {
+        record_id,
+        pharmacist_id: staffRow.staff_id, // ✅ this is now defined
+        medicine_id,
+        quantity,
+        dispense_date: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ])
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 })
@@ -72,7 +86,7 @@ export async function POST(req: NextRequest) {
     .from('medicine_stock')
     .update({
       quantity: medicine.quantity - quantity,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq('medicine_id', medicine_id)
 

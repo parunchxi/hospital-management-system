@@ -25,7 +25,9 @@ interface AppointmentsTableProps {
   onRowClick: (record: any) => void
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
+  onRowClick,
+}) => {
   const [appointments, setAppointments] = useState<any[]>([])
   const [isLoading, setLoading] = useState(true)
   const [visibleAppointments, setVisibleAppointments] = useState(3)
@@ -35,18 +37,18 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
     fetch('/api/appointments')
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
+          throw new Error(`HTTP error! Status: ${res.status}`)
         }
-        return res.json();
+        return res.json()
       })
       .then((data) => {
-        console.log('Appointments data:', data);
+        console.log('Appointments data:', data)
         setAppointments(data)
         setLoading(false)
       })
       .catch((error) => {
-        console.error('Error fetching appointments:', error);
-        setLoading(false);
+        console.error('Error fetching appointments:', error)
+        setLoading(false)
       })
   }, [])
 
@@ -73,13 +75,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
     }
   }
 
-  if (isLoading) return (
-    <Card>
-      <CardContent className="p-6 flex justify-center items-center">
-        Loading appointments...
-      </CardContent>
-    </Card>
-  )
+  if (isLoading)
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center">
+          Loading appointments...
+        </CardContent>
+      </Card>
+    )
 
   return (
     <Card>
@@ -106,32 +109,41 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
             </TableHeader>
             <TableBody>
               {appointments && appointments.length > 0 ? (
-                appointments.slice(0, visibleAppointments).map((record: any) => (
-                  <TableRow
-                    key={record.record_id}
-                    className="cursor-pointer"
-                    onClick={() => {
-                        alert(`Row clicked, patient data: ${JSON.stringify(record, null, 2)}`);
-                      onRowClick(record);
-                    }}
-                  >
-                    <TableCell>
-                      {record.patients?.users?.first_name} {record.patients?.users?.last_name}
-                    </TableCell>
-                    <TableCell>{record.symptoms || 'Not specified'}</TableCell>
-                    <TableCell>{record.patient_status || 'Unknown'}</TableCell>
-                    <TableCell>
-                      {record.visit_date ?
-                        new Date(record.visit_date).toLocaleDateString() :
-                        'Not scheduled'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(record.visit_status)}>
-                        {record.visit_status || 'Unknown'}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
+                appointments
+                  .slice(0, visibleAppointments)
+                  .map((record: any) => (
+                    <TableRow
+                      key={record.record_id}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        alert(
+                          `Row clicked, patient data: ${JSON.stringify(record, null, 2)}`,
+                        )
+                        onRowClick(record)
+                      }}
+                    >
+                      <TableCell>
+                        {record.patients?.users?.first_name}{' '}
+                        {record.patients?.users?.last_name}
+                      </TableCell>
+                      <TableCell>
+                        {record.symptoms || 'Not specified'}
+                      </TableCell>
+                      <TableCell>
+                        {record.patient_status || 'Unknown'}
+                      </TableCell>
+                      <TableCell>
+                        {record.visit_date
+                          ? new Date(record.visit_date).toLocaleDateString()
+                          : 'Not scheduled'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(record.visit_status)}>
+                          {record.visit_status || 'Unknown'}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-4">
@@ -146,10 +158,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ onRowClick }) => 
       {appointments && appointments.length > 3 && (
         <CardFooter className="flex justify-center gap-4 pt-2">
           {appointments.length > visibleAppointments && (
-            <Button onClick={loadMoreAppointments} variant="outline" size="sm">Load More</Button>
+            <Button onClick={loadMoreAppointments} variant="outline" size="sm">
+              Load More
+            </Button>
           )}
           {!initialRowsShown && (
-            <Button onClick={showLessAppointments} variant="outline" size="sm">Show Less</Button>
+            <Button onClick={showLessAppointments} variant="outline" size="sm">
+              Show Less
+            </Button>
           )}
         </CardFooter>
       )}

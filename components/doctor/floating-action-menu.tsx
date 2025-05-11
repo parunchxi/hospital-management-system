@@ -4,7 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/dialog'
 import {
   PlusIcon,
@@ -22,13 +22,20 @@ import {
   Trash2,
   Search,
   AlertCircle,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Toaster } from 'sonner'
-import { AdmissionForm } from './AdmissionForm'
-import { AppointmentForm } from './AppointmentForm'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { AdmissionForm } from './admission-form'
+import { AppointmentForm } from './appointment-form'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,7 +44,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 
@@ -115,13 +122,15 @@ const usePatientSearch = () => {
     setInputValue,
     handleInputChange,
     fetchPatient,
-    setPatientData
+    setPatientData,
   }
 }
 
 const FloatingActionMenu: React.FC = () => {
   const [openMenu, setOpenMenu] = useState(false)
-  const [dialogType, setDialogType] = useState<'admission' | 'appointment' | 'deleteRecord' | null>(null)
+  const [dialogType, setDialogType] = useState<
+    'admission' | 'appointment' | 'deleteRecord' | null
+  >(null)
   const [admission, setAdmission] = useState(initialAdmission)
   const [appointment, setAppointment] = useState(initialAppointment)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -160,46 +169,54 @@ const FloatingActionMenu: React.FC = () => {
   // Load room and nurse data on component mount
   useEffect(() => {
     Promise.all([
-      fetch('/api/staff?type=Nurse').then(res => res.json()),
-      fetch('/api/rooms?available=true').then(res => res.json())
+      fetch('/api/staff?type=Nurse').then((res) => res.json()),
+      fetch('/api/rooms?available=true').then((res) => res.json()),
     ])
-    .then(([nurseData, roomData]) => {
-      setNurses(nurseData || [])
-      setRooms(roomData || [])
-    })
-    .catch(err => {
-      toast.error('Error loading data')
-      console.error(err)
-    })
+      .then(([nurseData, roomData]) => {
+        setNurses(nurseData || [])
+        setRooms(roomData || [])
+      })
+      .catch((err) => {
+        toast.error('Error loading data')
+        console.error(err)
+      })
   }, [])
 
   // Update admission data when patient is selected
   useEffect(() => {
     if (admissionPatient) {
-      setAdmission(prev => ({ ...prev, patient_id: admissionPatient.patient_id }))
+      setAdmission((prev) => ({
+        ...prev,
+        patient_id: admissionPatient.patient_id,
+      }))
     }
   }, [admissionPatient])
 
   // Update appointment data when patient is selected
   useEffect(() => {
     if (appointmentPatient) {
-      setAppointment(prev => ({ ...prev, patient_id: appointmentPatient.patient_id }))
+      setAppointment((prev) => ({
+        ...prev,
+        patient_id: appointmentPatient.patient_id,
+      }))
     }
   }, [appointmentPatient])
 
   // Load records when delete dialog opens
   useEffect(() => {
     if (dialogType === 'deleteRecord') {
-      fetchRecords();
+      fetchRecords()
     }
-  }, [dialogType]);
+  }, [dialogType])
 
   // Form change handlers
   const handleAdmissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAdmission({ ...admission, [e.target.name]: e.target.value })
   }
 
-  const handleAppointmentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleAppointmentChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setAppointment({ ...appointment, [e.target.name]: e.target.value })
   }
 
@@ -256,58 +273,66 @@ const FloatingActionMenu: React.FC = () => {
 
   // Function to fetch records
   const fetchRecords = async () => {
-    setLoadingRecords(true);
+    setLoadingRecords(true)
     try {
-      const response = await fetch('/api/records');
+      const response = await fetch('/api/records')
       if (!response.ok) {
-        throw new Error('Failed to fetch records');
+        throw new Error('Failed to fetch records')
       }
-      const data = await response.json();
-      setRecords(data.data || []);
+      const data = await response.json()
+      setRecords(data.data || [])
     } catch (error) {
-      toast.error('Error loading records');
-      console.error(error);
+      toast.error('Error loading records')
+      console.error(error)
     } finally {
-      setLoadingRecords(false);
+      setLoadingRecords(false)
     }
-  };
+  }
 
   // Handle record deletion
   const handleDeleteRecord = async () => {
-    if (!selectedRecord) return;
-    
-    setDeleteLoading(true);
+    if (!selectedRecord) return
+
+    setDeleteLoading(true)
     try {
       const response = await fetch(`/api/records/${selectedRecord.record_id}`, {
         method: 'DELETE',
-      });
-      
+      })
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete record');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete record')
       }
-      
-      toast.success('Record deleted successfully');
+
+      toast.success('Record deleted successfully')
       // Refresh records list
-      fetchRecords();
-      setSelectedRecord(null);
+      fetchRecords()
+      setSelectedRecord(null)
     } catch (error: any) {
-      toast.error(error.message || 'Error deleting record');
+      toast.error(error.message || 'Error deleting record')
     } finally {
-      setDeleteLoading(false);
-      setConfirmDelete(false);
+      setDeleteLoading(false)
+      setConfirmDelete(false)
     }
-  };
+  }
 
   // Filter records based on search term
-  const filteredRecords = records.filter(record => {
-    const patientName = record.patients?.users?.first_name + ' ' + record.patients?.users?.last_name || '';
-    const doctorName = record.medical_staff?.users?.first_name + ' ' + record.medical_staff?.users?.last_name || '';
-    
-    return patientName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           String(record.record_id).includes(searchTerm);
-  });
+  const filteredRecords = records.filter((record) => {
+    const patientName =
+      record.patients?.users?.first_name +
+        ' ' +
+        record.patients?.users?.last_name || ''
+    const doctorName =
+      record.medical_staff?.users?.first_name +
+        ' ' +
+        record.medical_staff?.users?.last_name || ''
+
+    return (
+      patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(record.record_id).includes(searchTerm)
+    )
+  })
 
   // Reset form helpers
   const resetAdmissionForm = () => {
@@ -329,28 +354,41 @@ const FloatingActionMenu: React.FC = () => {
       <div className="fixed bottom-8 right-8 z-[100]">
         <DropdownMenu open={openMenu} onOpenChange={setOpenMenu}>
           <DropdownMenuTrigger asChild>
-            <Button variant="default" size="icon" className="rounded-full h-14 w-14 shadow-lg bg-primary hover:bg-primary/90">
+            <Button
+              variant="default"
+              size="icon"
+              className="rounded-full h-14 w-14 shadow-lg bg-primary hover:bg-primary/90"
+            >
               <PlusIcon className="h-6 w-6 text-primary-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" align="end" className="w-56">
             <DropdownMenuItem
               className="cursor-pointer flex items-center gap-2"
-              onClick={() => { setDialogType('admission'); setOpenMenu(false) }}
+              onClick={() => {
+                setDialogType('admission')
+                setOpenMenu(false)
+              }}
             >
               <Hospital className="h-4 w-4" />
               Create Admission
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer flex items-center gap-2"
-              onClick={() => { setDialogType('appointment'); setOpenMenu(false) }}
+              onClick={() => {
+                setDialogType('appointment')
+                setOpenMenu(false)
+              }}
             >
               <CalendarPlus className="h-4 w-4" />
               Create Appointment
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer flex items-center gap-2"
-              onClick={() => { setDialogType('deleteRecord'); setOpenMenu(false) }}
+              onClick={() => {
+                setDialogType('deleteRecord')
+                setOpenMenu(false)
+              }}
             >
               <Trash2 className="h-4 w-4" />
               Delete Record
@@ -362,7 +400,9 @@ const FloatingActionMenu: React.FC = () => {
       {/* Admission Dialog */}
       <Dialog
         open={dialogType === 'admission'}
-        onOpenChange={open => { if (!open) resetAdmissionForm() }}
+        onOpenChange={(open) => {
+          if (!open) resetAdmissionForm()
+        }}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -395,7 +435,9 @@ const FloatingActionMenu: React.FC = () => {
       {/* Appointment Dialog */}
       <Dialog
         open={dialogType === 'appointment'}
-        onOpenChange={open => { if (!open) resetAppointmentForm() }}
+        onOpenChange={(open) => {
+          if (!open) resetAppointmentForm()
+        }}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -428,8 +470,8 @@ const FloatingActionMenu: React.FC = () => {
         open={dialogType === 'deleteRecord'}
         onOpenChange={(open) => {
           if (!open) {
-            setDialogType(null);
-            setSearchTerm('');
+            setDialogType(null)
+            setSearchTerm('')
           }
         }}
       >
@@ -464,7 +506,9 @@ const FloatingActionMenu: React.FC = () => {
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
                 <h3 className="text-lg font-medium">No records found</h3>
-                <p className="text-sm text-muted-foreground">There are no records available for deletion.</p>
+                <p className="text-sm text-muted-foreground">
+                  There are no records available for deletion.
+                </p>
               </div>
             ) : (
               <div className="border rounded-md overflow-hidden">
@@ -481,26 +525,34 @@ const FloatingActionMenu: React.FC = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredRecords.map((record) => (
-                      <TableRow 
-                        key={record.record_id} 
-                        className={selectedRecord?.record_id === record.record_id ? "bg-muted" : ""}
+                      <TableRow
+                        key={record.record_id}
+                        className={
+                          selectedRecord?.record_id === record.record_id
+                            ? 'bg-muted'
+                            : ''
+                        }
                       >
                         <TableCell>{record.record_id}</TableCell>
                         <TableCell>
-                          {record.patients?.users?.first_name} {record.patients?.users?.last_name}
+                          {record.patients?.users?.first_name}{' '}
+                          {record.patients?.users?.last_name}
                         </TableCell>
                         <TableCell>
-                          {record.medical_staff?.users?.first_name} {record.medical_staff?.users?.last_name}
+                          {record.medical_staff?.users?.first_name}{' '}
+                          {record.medical_staff?.users?.last_name}
                         </TableCell>
-                        <TableCell>{new Date(record.visit_date).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {new Date(record.visit_date).toLocaleDateString()}
+                        </TableCell>
                         <TableCell>{record.visit_status}</TableCell>
                         <TableCell className="text-right">
                           <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => {
-                              setSelectedRecord(record);
-                              setConfirmDelete(true);
+                              setSelectedRecord(record)
+                              setConfirmDelete(true)
                             }}
                             disabled={record.visit_status === 'Completed'}
                           >
@@ -525,17 +577,20 @@ const FloatingActionMenu: React.FC = () => {
             <AlertDialogDescription>
               This will permanently delete the medical record for{' '}
               <span className="font-medium">
-                {selectedRecord?.patients?.users?.first_name} {selectedRecord?.patients?.users?.last_name}
+                {selectedRecord?.patients?.users?.first_name}{' '}
+                {selectedRecord?.patients?.users?.last_name}
               </span>
               . This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
-                e.preventDefault();
-                handleDeleteRecord();
+                e.preventDefault()
+                handleDeleteRecord()
               }}
               disabled={deleteLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

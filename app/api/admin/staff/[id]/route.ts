@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import { getUserRole } from '@/utils/getRoles'
+import { getUserRole } from '@/utils/get-role'
 import { NextRequest, NextResponse } from 'next/server'
 
 const validStaffTypes = ['Doctor', 'Nurse', 'Pharmacist', 'Admin']
@@ -15,12 +15,8 @@ export async function PATCH(
     return NextResponse.json({ error: 'ID is required' }, { status: 400 })
   }
 
-  const {
-    department_id,
-    staff_type,
-    license_number,
-    employment_status,
-  } = await req.json()
+  const { department_id, staff_type, license_number, employment_status } =
+    await req.json()
 
   const result = await getUserRole()
   if (!result)
@@ -33,12 +29,7 @@ export async function PATCH(
       { status: 403 },
     )
 
-  if (
-    !department_id &&
-    !staff_type &&
-    !license_number &&
-    !employment_status 
-  ) {
+  if (!department_id && !staff_type && !license_number && !employment_status) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
   }
 

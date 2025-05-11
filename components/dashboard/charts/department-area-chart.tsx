@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   AreaChart as ReAreaChart,
   Area,
@@ -7,9 +13,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts'
-import { Badge } from "@/components/ui/badge"
+import { Badge } from '@/components/ui/badge'
 
 interface DepartmentAreaChartProps {
   title: string
@@ -17,19 +23,26 @@ interface DepartmentAreaChartProps {
   config: Record<string, { label: string; color: string }>
 }
 
-export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChartProps) {
-  const [visibleDepts, setVisibleDepts] = React.useState<string[]>(Object.keys(config));
-  
+export function DepartmentAreaChart({
+  title,
+  data,
+  config,
+}: DepartmentAreaChartProps) {
+  const [visibleDepts, setVisibleDepts] = React.useState<string[]>(
+    Object.keys(config),
+  )
+
   // Toggle department visibility
   const toggleDepartment = (dept: string) => {
     if (visibleDepts.includes(dept)) {
-      if (visibleDepts.length > 1) { // Don't remove if it's the only one visible
-        setVisibleDepts(visibleDepts.filter(d => d !== dept));
+      if (visibleDepts.length > 1) {
+        // Don't remove if it's the only one visible
+        setVisibleDepts(visibleDepts.filter((d) => d !== dept))
       }
     } else {
-      setVisibleDepts([...visibleDepts, dept]);
+      setVisibleDepts([...visibleDepts, dept])
     }
-  };
+  }
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -41,10 +54,13 @@ export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChart
             {payload
               .filter((p: any) => visibleDepts.includes(p.dataKey))
               .map((entry: any, index: number) => (
-                <div key={`item-${index}`} className="flex items-center justify-between gap-2">
+                <div
+                  key={`item-${index}`}
+                  className="flex items-center justify-between gap-2"
+                >
                   <div className="flex items-center">
-                    <div 
-                      className="w-3 h-3 rounded-full mr-2" 
+                    <div
+                      className="w-3 h-3 rounded-full mr-2"
                       style={{ backgroundColor: entry.color }}
                     />
                     <span className="text-sm font-medium">{entry.name}</span>
@@ -54,10 +70,10 @@ export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChart
               ))}
           </div>
         </div>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <Card className="h-full">
@@ -68,13 +84,15 @@ export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChart
           {Object.entries(config).map(([key, { label, color }]) => (
             <Badge
               key={key}
-              variant={visibleDepts.includes(key) ? "default" : "outline"}
+              variant={visibleDepts.includes(key) ? 'default' : 'outline'}
               className="cursor-pointer"
               onClick={() => toggleDepartment(key)}
               style={{
-                backgroundColor: visibleDepts.includes(key) ? color : 'transparent',
+                backgroundColor: visibleDepts.includes(key)
+                  ? color
+                  : 'transparent',
                 borderColor: color,
-                color: visibleDepts.includes(key) ? 'white' : undefined
+                color: visibleDepts.includes(key) ? 'white' : undefined,
               }}
             >
               {label}
@@ -87,9 +105,16 @@ export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChart
           <ReAreaChart data={data}>
             <defs>
               {Object.entries(config).map(([key, { color }]) => (
-                <linearGradient key={key} id={`color-${key}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor={color} stopOpacity={0.1}/>
+                <linearGradient
+                  key={key}
+                  id={`color-${key}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0.1} />
                 </linearGradient>
               ))}
             </defs>
@@ -101,25 +126,26 @@ export function DepartmentAreaChart({ title, data, config }: DepartmentAreaChart
               tickMargin={8}
               tick={{ fontSize: 12 }}
             />
-            <YAxis 
+            <YAxis
               tick={{ fontSize: 12 }}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
             />
             <Tooltip content={<CustomTooltip />} />
-            {Object.entries(config).map(([key, { color }]) => (
-              visibleDepts.includes(key) && (
-                <Area
-                  key={key}
-                  type="monotone"
-                  dataKey={key}
-                  stroke={color}
-                  fill={`url(#color-${key})`}
-                  strokeWidth={2}
-                />
-              )
-            ))}
+            {Object.entries(config).map(
+              ([key, { color }]) =>
+                visibleDepts.includes(key) && (
+                  <Area
+                    key={key}
+                    type="monotone"
+                    dataKey={key}
+                    stroke={color}
+                    fill={`url(#color-${key})`}
+                    strokeWidth={2}
+                  />
+                ),
+            )}
           </ReAreaChart>
         </ResponsiveContainer>
       </CardContent>
