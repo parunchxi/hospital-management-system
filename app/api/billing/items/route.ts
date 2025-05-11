@@ -12,7 +12,7 @@ const supabase = createClient(
 
 type ItemBody = {
   bill_id     : number;
-  item_type   : 'Medicine' | 'Treatment';   
+  item_type   : 'Medicine' | 'Treatment' | 'Rooom';   
   item_id_ref : number;
   description : string;
   quantity    : number;
