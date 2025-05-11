@@ -14,6 +14,7 @@ import {
   CardDescription,
 } from '@/components/ui/card'
 import { Stethoscope, Heart, FileText, Activity, Pill } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface MedicalRecord {
   record_id?: string | number
@@ -40,7 +41,7 @@ interface MedicalRecord {
 
 interface RecordFormProps {
   record: MedicalRecord
-  onSave: (updatedRecord: MedicalRecord) => void
+  onSave: (updatedRecord: MedicalRecord) => Promise<void> | void
   onCancel: () => void
 }
 
@@ -48,15 +49,33 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
   const [formData, setFormData] = React.useState<MedicalRecord>({
     ...record
   })
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    try {
+      const result = onSave(formData)
+
+      if (result instanceof Promise) {
+        // If onSave returns a Promise, wait for it to resolve before showing toast
+        await result
+        toast.success('Medical record updated successfully', {
+          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`
+        })
+      } else {
+        // If onSave returns void (synchronously), show toast right away
+        toast.success('Medical record updated successfully', {
+          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`
+        })
+      }
+    } catch (error) {
+      // Show error toast if saving fails
+      toast.error('Failed to update medical record', {
+        description: 'Please try again or contact support if the issue persists.'
+      })
+    }
   }
 
   return (
@@ -85,7 +104,7 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
             </div>
             <div className="space-y-2">
               <Label htmlFor="visit_status">Record Status</Label>
-              <select 
+              <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 id="visit_status"
                 name="visit_status"
@@ -99,7 +118,7 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
             </div>
             <div className="space-y-2">
               <Label htmlFor="patient_status">Patient Status</Label>
-              <select 
+              <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 id="patient_status"
                 name="patient_status"

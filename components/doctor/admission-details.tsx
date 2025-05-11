@@ -5,10 +5,38 @@ import {
   CardTitle,
   CardContent,
 } from '@/components/ui/card'
-import { Heart, Loader2, AlertCircle } from 'lucide-react'
+import { Heart, Loader2, AlertCircle, Pencil, User, Calendar, Hospital } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useForm } from 'react-hook-form'
+import { useToast } from '@/components/ui/use-toast'
 
 interface AdmissionInfo {
+  admission_id?: string
   admission_date?: string
   discharge_date?: string
   updated_at?: string
@@ -29,19 +57,43 @@ interface AdmissionInfo {
   }
 }
 
+interface RoomInfo {
+  room_id: string;
+  room_type: string;
+  department: { name: string };
+}
+
+interface NurseInfo {
+  staff_id: string;
+  users: { first_name: string; last_name: string };
+}
+
 interface AdmissionDetailsProps {
-  patientId?: string
-  roomNumber?: string
-  visitDate?: string
+  patientId?: string;
+  roomNumber?: string;
+  visitDate?: string;
 }
 
 const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDate }) => {
   const [admissionInfo, setAdmissionInfo] = useState<AdmissionInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [rooms, setRooms] = useState<RoomInfo[]>([]);
+  const [nurses, setNurses] = useState<NurseInfo[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Form setup
+  const form = useForm({
+    defaultValues: {
+      room_id: '',
+      nurse_id: '',
+      discharge_date: '',
+    },
+  });
 
   useEffect(() => {
-    // Only fetch if we have a patient ID
     if (!patientId) return;
 
     setIsLoading(true);
@@ -67,6 +119,59 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
         setIsLoading(false);
       });
   }, [patientId]);
+
+  useEffect(() => {
+    if (!isDialogOpen) return;
+    fetch('/api/rooms')
+      .then(res => res.json())
+      .then(data => setRooms(Array.isArray(data) ? data : []));
+    fetch('/api/staff?type=Nurse')
+      .then(res => res.json())
+      .then(data => setNurses(Array.isArray(data) ? data : []));
+    // Reset form with current admission info
+    if (admissionInfo) {
+      let nurseId = '';
+      if (admissionInfo.nurse && admissionInfo.nurse.user && nurses.length) {
+        const foundNurse = nurses.find(n => n.users.first_name === admissionInfo.nurse?.user?.first_name && n.users.last_name === admissionInfo.nurse?.user?.last_name);
+        nurseId = foundNurse ? foundNurse.staff_id : '';
+      }
+      form.reset({
+        room_id: admissionInfo.room?.room_id || '',
+        nurse_id: nurseId,
+        discharge_date: admissionInfo.discharge_date || '',
+      });
+    }
+  }, [isDialogOpen, admissionInfo]);
+
+  // PATCH handler
+  const onSubmit = async (values: any) => {
+    if (!admissionInfo?.admission_id) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/admission/${admissionInfo.admission_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          room_id: values.room_id,
+          nurse_id: values.nurse_id ? parseInt(values.nurse_id) : null,
+          discharge_date: values.discharge_date || null,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to update admission');
+      toast({ title: 'Success', description: 'Admission updated.' });
+      setIsDialogOpen(false);
+      // Refresh admission info
+      setIsLoading(true);
+      fetch(`/api/admission/${patientId}`)
+        .then(res => res.json())
+        .then(data => setAdmissionInfo(Array.isArray(data) && data.length > 0 ? data[0] : data))
+        .finally(() => setIsLoading(false));
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Check if we have admission data from the API
   const hasAdmissionData = admissionInfo &&
@@ -98,6 +203,17 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
           <Heart className="h-4 w-4 text-muted-foreground" />
           Admission Details
         </CardTitle>
+        {hasAdmissionData && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 ml-2"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Pencil className="h-4 w-4" />
+            <span className="sr-only">Edit admission details</span>
+          </Button>
+        )}
         {/* Debug output - remove in production */}
         <div className="text-xs text-gray-400 mt-1 break-all hidden">
           {JSON.stringify(admissionInfo)}
@@ -183,6 +299,102 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
           </div>
         )}
       </CardContent>
+      {/* Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4" />
+              Edit Admission Details
+            </DialogTitle>
+            <DialogDescription>
+              Update the room, nurse, and discharge date for this admission.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="room_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Hospital className="h-4 w-4 opacity-70" />
+                      Room
+                    </FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a room" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {rooms.map(room => (
+                          <SelectItem key={room.room_id} value={room.room_id}>
+                            {room.room_id} - {room.room_type} ({room.department?.name})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nurse_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <User className="h-4 w-4 opacity-70" />
+                      Nurse
+                    </FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a nurse" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {nurses.map(nurse => (
+                          <SelectItem key={nurse.staff_id} value={nurse.staff_id}>
+                            {nurse.users.first_name} {nurse.users.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="discharge_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 opacity-70" />
+                      Discharge Date
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Save'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
