@@ -39,7 +39,12 @@ interface MedicalRecord {
   visit_date: string
   patient_status: string
   visit_status: string
-  doctor_id: number
+  doctor_id: {
+    users?: {
+      first_name: string
+      last_name: string
+    }
+  } | number  // Can be either an object with users or just a number
   diagnosis?: string
   treatment?: string
   notes?: string
@@ -329,8 +334,8 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                     </div>
                     <div className="flex justify-between items-center mt-1.5">
                       <div className="text-muted-foreground">
-                        {record.medical_staff?.users ? (
-                          <span>Dr. {record.medical_staff.users.first_name} {record.medical_staff.users.last_name}</span>
+                        {typeof record.doctor_id === 'object' && record.doctor_id?.users ? (
+                          <span>Dr. {record.doctor_id.users.first_name} {record.doctor_id.users.last_name}</span>
                         ) : (
                           <span>Patient Status: {record.patient_status}</span>
                         )}

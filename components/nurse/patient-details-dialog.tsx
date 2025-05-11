@@ -72,6 +72,21 @@ export function PatientDetailsDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Function to transform medical records to match expected format
+  const transformMedicalRecords = (records?: Array<any>) => {
+    if (!records) return undefined;
+    return records.map(record => ({
+      ...record,
+      // Add missing fields with default values
+      patient_status: record.patient_status || 'Unknown',
+      diagnosis: record.diagnosis || '',
+      treatment: record.treatment || '',
+      notes: record.notes || '',
+      symptoms: record.symptoms || '',
+      prescription: record.prescription || ''
+    }));
+  };
+
   useEffect(() => {
     async function fetchPatientData() {
       if (!open || !patient) {
@@ -168,7 +183,9 @@ export function PatientDetailsDialog({
             </TabsContent>
 
             <TabsContent value="medical" className="space-y-4 mt-4">
-              <PatientMedicalRecords medicalRecords={patientInfo.medical_records} />
+              <PatientMedicalRecords 
+                medicalRecords={transformMedicalRecords(patientInfo.medical_records)} 
+              />
             </TabsContent>
 
           </Tabs>
