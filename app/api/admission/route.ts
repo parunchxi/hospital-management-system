@@ -167,9 +167,8 @@ export async function GET() {
   }
   const { role } = result
 
-  if (role == 'Admin') {
+  if (role == 'Admin' || role == 'Doctor') {
 
-    // Fetch all admission data
     const { data, error } = await supabase
       .from('admissions')
       .select(`
