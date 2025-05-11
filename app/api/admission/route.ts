@@ -116,6 +116,41 @@ export async function POST(req: Request) {
     .is('discharge_date', null)
     .single()
 
+  // Validate check if added admission, it would not exceed selected room capacity
+  const { data: roomCapacity, error: roomCapacityError } = await supabase
+    .from('rooms')
+    .select('capacity')
+    .eq('room_id', room_id)
+    .single()
+  if (roomCapacityError || !roomCapacity) {
+    return NextResponse.json(
+      { error: 'Invalid room_id' },
+      { status: 400 },
+    )
+  }
+
+  const { count, error: currentOccupancyError } = await supabase
+    .from('admissions')
+    .select('*', { count: 'exact', head: true })
+    .eq('room_id', room_id)
+    .is('discharge_date', null)
+
+  if (currentOccupancyError) {
+    console.error('Error checking current occupancy:', currentOccupancyError)
+    return NextResponse.json(
+      { error: 'Failed to check current occupancy' },
+      { status: 500 },
+    )
+  }
+
+  const currentOccupancyCount = count || 0
+  if (currentOccupancyCount >= roomCapacity.capacity) {
+    return NextResponse.json(
+      { error: 'Room is at full capacity' },
+      { status: 400 },
+    )
+  }
+
   if (existingAdmissionError && existingAdmissionError.code !== 'PGRST116') { // Ignore "No rows found" error
     console.error('Error checking existing admission:', existingAdmissionError)
     return NextResponse.json(
