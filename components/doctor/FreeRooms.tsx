@@ -55,8 +55,19 @@ const RoomAvailabilityTable: React.FC = () => {
         if (!admissionsResponse.ok) throw new Error('Failed to fetch admissions')
         const admissionsData = await admissionsResponse.json()
         
+        const today = new Date()
+        today.setHours(0, 0, 0, 0) // Set to beginning of today
+        
         const activeAdmissions = admissionsData.data ? 
-          admissionsData.data.filter((admission: Admission) => admission.discharge_date === null) : 
+          admissionsData.data.filter((admission: Admission) => {
+            // Consider active if:
+            // 1. discharge_date is null OR 
+            // 2. discharge_date is in the future
+            // AND exclude those where discharge_date is in the past
+            return (admission.discharge_date === null || 
+                   new Date(admission.discharge_date) > today) &&
+                   !(admission.discharge_date && new Date(admission.discharge_date) < today);
+          }) : 
           [];
         
         const admissionsByRoom: Record<string, number> = {}
