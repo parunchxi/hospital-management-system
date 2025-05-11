@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { getUserRole } from '@/utils/getRoles';
 
-export async function PATCH(req: Request, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function PATCH(req: Request, {params}: {params: Promise<{ id: string }>}) {
+  const { id } = await params;
+  console.log('Updating appointment with ID:', id);
   const {
     visit_status,
     patient_status,
