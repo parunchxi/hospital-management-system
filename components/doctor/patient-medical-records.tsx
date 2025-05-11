@@ -99,12 +99,14 @@ function RecordDetails({
   record, 
   isLoading, 
   error, 
-  onClose 
+  onClose,
+  onEdit 
 }: { 
   record: MedicalRecord, 
   isLoading: boolean, 
   error: string | null,
-  onClose: () => void 
+  onClose: () => void,
+  onEdit: () => void 
 }) {
   return (
     <Card className="mb-4 border border-primary/20 shadow-md">
@@ -237,6 +239,10 @@ function RecordDetails({
           </Tabs>
         )}
       </CardContent>
+
+      <CardFooter className="pt-2 pb-3 flex justify-end">
+        <ButtonIcon onClick={onEdit} />
+      </CardFooter>
     </Card>
   )
 }
@@ -261,7 +267,6 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
       const recordData = await response.json()
       setSelectedRecord({
         ...recordData,
-        // Map API fields to UI fields for compatibility
         treatment: recordData.treatment_plan || recordData.treatment,
         prescription: recordData.medicine_prescribed || recordData.prescription,
       })
@@ -316,31 +321,18 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
         throw new Error(errorData.error || 'Failed to update record')
       }
 
-      const updatedData = await response.json()
-
-      setSelectedRecord({
-        ...selectedRecord,
-        ...updatedData,
-        // Ensure UI fields are populated
-        treatment: updatedData.treatment_plan || updatedData.treatment,
-        prescription: updatedData.medicine_prescribed || updatedData.prescription,
-      })
-
+      // Close form first
       setIsFormOpen(false)
+      
+      // Re-fetch record data to ensure we have the latest version
+      if (updatedRecord.record_id) {
+        fetchRecordDetails(updatedRecord.record_id)
+      }
 
-      // Use more accessible notification method instead of alert
-      const notification = document.createElement('div');
-      notification.setAttribute('role', 'status');
-      notification.setAttribute('aria-live', 'polite');
-      notification.className = 'sr-only';
-      notification.textContent = 'Record updated successfully!';
-      document.body.appendChild(notification);
-      setTimeout(() => document.body.removeChild(notification), 1000);
     } catch (error) {
       console.error('Error updating record:', error)
-      
-      // Use a more accessible error notification instead of alert
-      setRecordError(error instanceof Error ? error.message : 'Failed to update record');
+      // Set error for component display
+      setRecordError(error instanceof Error ? error.message : 'Failed to update record')
     }
   }
 
@@ -360,6 +352,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
               isLoading={isLoadingRecord}
               error={recordError}
               onClose={() => setSelectedRecord(null)}
+              onEdit={handleEditRecord}
             />
           )}
 

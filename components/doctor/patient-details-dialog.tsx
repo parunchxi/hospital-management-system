@@ -142,24 +142,28 @@ export function PatientDetailsDialog({
             <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
             Patient Information
           </DialogTitle>
-          <DialogDescription>
-            {isLoading ? (
+          {isLoading ? (
+            <div className="text-sm text-muted-foreground">
               <div className="flex items-center gap-2" aria-live="polite">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Loading patient details...
               </div>
-            ) : error ? (
+            </div>
+          ) : error ? (
+            <div className="text-sm text-muted-foreground">
               <div className="flex items-center gap-2 text-destructive" role="alert">
                 <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 {error}
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" aria-hidden="true" />
                 <span>Patient ID: {patientInfo?.patient_id || "Unknown"}</span>
               </div>
-            )}
-          </DialogDescription>
+            </div>
+          )}
         </DialogHeader>
 
         {isLoading ? (
