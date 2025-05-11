@@ -1,6 +1,6 @@
-import { SquarePen } from "lucide-react"
+import { SquarePen } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 
 export function ButtonIcon({ onClick }: { onClick?: () => void }) {
   return (

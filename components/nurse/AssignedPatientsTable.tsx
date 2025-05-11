@@ -25,7 +25,9 @@ interface AssignedPatientsTableProps {
   onRowClick: (patient: any) => void
 }
 
-const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClick }) => {
+const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({
+  onRowClick,
+}) => {
   const [admissions, setAdmissions] = useState<any[]>([])
   const [isLoading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,21 +39,21 @@ const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClic
     fetch('/api/admission')
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
+          throw new Error(`HTTP error! Status: ${res.status}`)
         }
-        return res.json();
+        return res.json()
       })
       .then((responseData) => {
-        console.log('Admissions data:', responseData);
+        console.log('Admissions data:', responseData)
         // The API returns data in the 'data' property
-        const admissionsData = responseData.data || [];
-        setAdmissions(admissionsData);
-        setLoading(false);
+        const admissionsData = responseData.data || []
+        setAdmissions(admissionsData)
+        setLoading(false)
       })
       .catch((error) => {
-        console.error('Error fetching admissions:', error);
-        setError(error.message || 'Failed to fetch assigned patients');
-        setLoading(false);
+        console.error('Error fetching admissions:', error)
+        setError(error.message || 'Failed to fetch assigned patients')
+        setLoading(false)
       })
   }, [])
 
@@ -80,22 +82,24 @@ const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClic
     }
   }
 
-  if (isLoading) return (
-    <Card>
-      <CardContent className="p-6 flex justify-center items-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
-        Loading assigned patients...
-      </CardContent>
-    </Card>
-  )
+  if (isLoading)
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mr-2" />
+          Loading assigned patients...
+        </CardContent>
+      </Card>
+    )
 
-  if (error) return (
-    <Card>
-      <CardContent className="p-6">
-        <p className="text-destructive">Error: {error}</p>
-      </CardContent>
-    </Card>
-  )
+  if (error)
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-destructive">Error: {error}</p>
+        </CardContent>
+      </Card>
+    )
 
   return (
     <Card>
@@ -126,10 +130,12 @@ const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClic
                   <TableRow
                     key={admission.admission_id}
                     className="cursor-pointer"
-                    onClick={() => onRowClick({
-                      patient_id: admission.patient_id,
-                      admission: admission
-                    })}
+                    onClick={() =>
+                      onRowClick({
+                        patient_id: admission.patient_id,
+                        admission: admission,
+                      })
+                    }
                   >
                     <TableCell className="flex items-center gap-1">
                       <BedIcon className="h-4 w-4 text-muted-foreground" />
@@ -139,19 +145,23 @@ const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClic
                       {admission.rooms?.departments?.name || 'Not specified'}
                     </TableCell>
                     <TableCell>
-                      {admission.admission_date ?
-                        new Date(admission.admission_date).toLocaleDateString() :
-                        'Not admitted'}
+                      {admission.admission_date
+                        ? new Date(
+                            admission.admission_date,
+                          ).toLocaleDateString()
+                        : 'Not admitted'}
                     </TableCell>
                     <TableCell>
-                      {admission.discharge_date ?
-                        new Date(admission.discharge_date).toLocaleDateString() :
-                        'Not specified'}
+                      {admission.discharge_date
+                        ? new Date(
+                            admission.discharge_date,
+                          ).toLocaleDateString()
+                        : 'Not specified'}
                     </TableCell>
                     <TableCell>
-                      {admission.admission_date ? 
-                        `${Math.ceil((new Date().getTime() - new Date(admission.admission_date).getTime()) / (1000 * 3600 * 24))} days` : 
-                        'N/A'}
+                      {admission.admission_date
+                        ? `${Math.ceil((new Date().getTime() - new Date(admission.admission_date).getTime()) / (1000 * 3600 * 24))} days`
+                        : 'N/A'}
                     </TableCell>
                   </TableRow>
                 ))
@@ -169,10 +179,14 @@ const AssignedPatientsTable: React.FC<AssignedPatientsTableProps> = ({ onRowClic
       {admissions.length > 5 && (
         <CardFooter className="flex justify-center gap-4 pt-2">
           {admissions.length > visiblePatients && (
-            <Button onClick={loadMorePatients} variant="outline" size="sm">Load More</Button>
+            <Button onClick={loadMorePatients} variant="outline" size="sm">
+              Load More
+            </Button>
           )}
           {!initialRowsShown && (
-            <Button onClick={showLessPatients} variant="outline" size="sm">Show Less</Button>
+            <Button onClick={showLessPatients} variant="outline" size="sm">
+              Show Less
+            </Button>
           )}
         </CardFooter>
       )}

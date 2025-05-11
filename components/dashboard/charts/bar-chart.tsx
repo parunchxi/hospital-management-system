@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import {
+  BarChart as ReBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 
 interface ChartDataProps {
   title: string
@@ -10,7 +17,13 @@ interface ChartDataProps {
   color?: string
 }
 
-export function BarChartCard({ title, data, dataKey, categoryKey, color = "hsl(var(--chart-2))" }: ChartDataProps) {
+export function BarChartCard({
+  title,
+  data,
+  dataKey,
+  categoryKey,
+  color = 'hsl(var(--chart-2))',
+}: ChartDataProps) {
   return (
     <Card>
       <CardHeader>

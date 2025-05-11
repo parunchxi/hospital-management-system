@@ -51,15 +51,17 @@ const DoctorInfoCard: React.FC<DoctorInfoCardProps> = ({ type }) => {
     }
   }, [notes])
 
-  if (isLoading) return type === 'name' ? <span>Loading...</span> : <div>Loading...</div>
-  if (!doctor) return type === 'name' ? <span>No data</span> : <div>No profile data</div>
+  if (isLoading)
+    return type === 'name' ? <span>Loading...</span> : <div>Loading...</div>
+  if (!doctor)
+    return type === 'name' ? <span>No data</span> : <div>No profile data</div>
 
   if (type === 'name') {
     return <span>{doctor.users.first_name}</span>
   }
 
   return (
-    <Card >
+    <Card>
       <CardHeader>
         <CardTitle className="text-lg font-bold flex items-center gap-2">
           <User2 className="h-5 w-5 text-muted-foreground" />
@@ -89,19 +91,27 @@ const DoctorInfoCard: React.FC<DoctorInfoCardProps> = ({ type }) => {
         <div className="pt-2 border-t border-gray-100">
           <div className="flex items-center gap-2 mt-2">
             <BadgeCheck className="h-4 w-4" />
-            <span><strong>Staff ID:</strong> {doctor.staff_id}</span>
+            <span>
+              <strong>Staff ID:</strong> {doctor.staff_id}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <GraduationCap className="h-4 w-4" />
-            <span><strong>License:</strong> {doctor.license_number}</span>
+            <span>
+              <strong>License:</strong> {doctor.license_number}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <Building2 className="h-4 w-4" />
-            <span><strong>Department:</strong> {doctor.departments.name}</span>
+            <span>
+              <strong>Department:</strong> {doctor.departments.name}
+            </span>
           </div>
           <div className="flex items-center gap-2 mt-2">
             <Briefcase className="h-4 w-4" />
-            <span><strong>Joined:</strong> {doctor.date_hired}</span>
+            <span>
+              <strong>Joined:</strong> {doctor.date_hired}
+            </span>
           </div>
         </div>
 
@@ -117,8 +127,7 @@ const DoctorInfoCard: React.FC<DoctorInfoCardProps> = ({ type }) => {
             placeholder="Write your notes here..."
             className="min-h-[100px] w-full"
           />
-          <p className="text-xs text-muted-foreground mt-1">
-          </p>
+          <p className="text-xs text-muted-foreground mt-1"></p>
         </div>
       </CardContent>
     </Card>

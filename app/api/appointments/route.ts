@@ -24,25 +24,25 @@ export async function GET(req: Request) {
     .eq('user_id', userId)
     .single()
 
-
   if (role === 'Patient') {
     const { data: patient, error: patientError } = await supabase
       .from('patients')
       .select('patient_id')
       .eq('user_id', userId)
-      .single();
+      .single()
 
     if (patientError || !patient) {
-      console.error('Fetch patient ID error:', patientError);
+      console.error('Fetch patient ID error:', patientError)
       return NextResponse.json(
         { error: 'Failed to fetch patient ID' },
-        { status: 500 }
-      );
+        { status: 500 },
+      )
     }
 
     const { data, error } = await supabase
       .from('medical_records')
-      .select(`
+      .select(
+        `
       visit_date,
       visit_status,
       medical_staff: doctor_id (
@@ -51,29 +51,31 @@ export async function GET(req: Request) {
             last_name
           )
         )
-      `)
-      .eq('patient_id', patient.patient_id);
+      `,
+      )
+      .eq('patient_id', patient.patient_id)
 
     if (error) {
-      console.error('Fetch patient records error:', error);
+      console.error('Fetch patient records error:', error)
       return NextResponse.json(
         { error: 'Failed to fetch patient records' },
-        { status: 500 }
-      );
+        { status: 500 },
+      )
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data)
   } else if (role === 'Doctor') {
     if (!doctor || !doctor.staff_id) {
       return NextResponse.json(
         { error: 'Doctor information is missing or invalid' },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
 
     const { data, error } = await supabase
       .from('medical_records')
-      .select(`
+      .select(
+        `
         patient_id,
         record_id,
         symptoms,
@@ -86,23 +88,25 @@ export async function GET(req: Request) {
                 last_name
             )
         )
-      `)
+      `,
+      )
       .eq('doctor_id', doctor.staff_id)
       .eq('visit_status', 'Scheduled')
-      .order('visit_date', { ascending: false });
+      .order('visit_date', { ascending: false })
     if (error) {
-      console.error('Fetch doctor appointments error:', error);
+      console.error('Fetch doctor appointments error:', error)
       return NextResponse.json(
         { error: 'Failed to fetch doctor appointments' },
-        { status: 500 }
-      );
+        { status: 500 },
+      )
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data)
   } else if (role === 'Admin' || role === 'Pharmacist') {
     const { data, error } = await supabase
       .from('medical_records')
-      .select(`
+      .select(
+        `
         record_id,
         symptoms,
         patient_status,
@@ -114,20 +118,20 @@ export async function GET(req: Request) {
                 last_name
             )
         )
-      `)
+      `,
+      )
       .eq('visit_status', 'Scheduled')
-      .order('visit_date', { ascending: false });
+      .order('visit_date', { ascending: false })
     if (error) {
-      console.error('Fetch all appointments error:', error);
+      console.error('Fetch all appointments error:', error)
       return NextResponse.json(
         { error: 'Failed to fetch all appointments' },
-        { status: 500 }
-      );
+        { status: 500 },
+      )
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data)
   }
-
 }
 
 // POST /api/appointments → Create appointment (Doctor only)

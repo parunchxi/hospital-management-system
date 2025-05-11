@@ -45,13 +45,21 @@ interface RecordFormProps {
   onCancel: () => void
 }
 
-const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => {
+const RecordForm: React.FC<RecordFormProps> = ({
+  record,
+  onSave,
+  onCancel,
+}) => {
   const [formData, setFormData] = React.useState<MedicalRecord>({
-    ...record
+    ...record,
   })
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,18 +70,19 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
         // If onSave returns a Promise, wait for it to resolve before showing toast
         await result
         toast.success('Medical record updated successfully', {
-          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`
+          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`,
         })
       } else {
         // If onSave returns void (synchronously), show toast right away
         toast.success('Medical record updated successfully', {
-          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`
+          description: `Record for visit on ${new Date(formData.visit_date).toLocaleDateString()} has been updated.`,
         })
       }
     } catch (error) {
       // Show error toast if saving fails
       toast.error('Failed to update medical record', {
-        description: 'Please try again or contact support if the issue persists.'
+        description:
+          'Please try again or contact support if the issue persists.',
       })
     }
   }
@@ -87,7 +96,8 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
             Edit Medical Record
           </CardTitle>
           <CardDescription>
-            Update information for visit on {new Date(record.visit_date).toLocaleDateString()}
+            Update information for visit on{' '}
+            {new Date(record.visit_date).toLocaleDateString()}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-0">
@@ -185,16 +195,12 @@ const RecordForm: React.FC<RecordFormProps> = ({ record, onSave, onCancel }) => 
               rows={2}
             />
           </div>
-
-
         </CardContent>
         <CardFooter className="flex justify-end gap-2 px-0 pt-4 border-t">
           <Button variant="outline" type="button" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">
-            Save Changes
-          </Button>
+          <Button type="submit">Save Changes</Button>
         </CardFooter>
       </Card>
     </form>

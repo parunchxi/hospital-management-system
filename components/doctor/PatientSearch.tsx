@@ -1,15 +1,15 @@
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, User, Calendar } from 'lucide-react';
+import React from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Loader2, User, Calendar } from 'lucide-react'
 
 interface PatientSearchProps {
-  patientId: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  patient: any;
-  isLoading: boolean;
-  error: string;
-  label?: string;
+  patientId: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  patient: any
+  isLoading: boolean
+  error: string
+  label?: string
 }
 
 export const PatientSearch: React.FC<PatientSearchProps> = ({
@@ -18,7 +18,7 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
   patient,
   isLoading,
   error,
-  label = "Patient ID",
+  label = 'Patient ID',
 }) => {
   return (
     <div className="space-y-2">
@@ -42,11 +42,7 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
           </div>
         )}
 
-        {error && (
-          <div className="text-sm text-destructive">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-sm text-destructive">{error}</div>}
 
         {patient && (
           <div className="text-sm p-3 border rounded-md bg-muted/50 space-y-2">
@@ -68,5 +64,5 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

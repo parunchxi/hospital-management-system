@@ -7,7 +7,7 @@ import { getUserRole } from '@/utils/getRoles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
 export async function GET(req: NextRequest) {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const {role, userId} = result
+  const { role, userId } = result
 
   const { data: patientRow, error: patientError } = await supabase
     .from('patients')
@@ -24,17 +24,21 @@ export async function GET(req: NextRequest) {
     .eq('user_id', userId)
     .single()
 
-    console.log('patientRow', patientRow, 'patientError', patientError)
+  console.log('patientRow', patientRow, 'patientError', patientError)
 
   if (patientError || !patientRow) {
-    return NextResponse.json({ error: 'Patient record not found' }, { status: 404 })
+    return NextResponse.json(
+      { error: 'Patient record not found' },
+      { status: 404 },
+    )
   }
 
   const { patient_id } = patientRow
 
   const { data, error } = await supabase
     .from('billing')
-    .select(`
+    .select(
+      `
       bill_id,
       total_price,
       status,
@@ -49,7 +53,8 @@ export async function GET(req: NextRequest) {
         unit_price,
         total_price
       )
-    `)
+    `,
+    )
     .eq('patient_id', patient_id)
     .order('created_at', { ascending: false })
 

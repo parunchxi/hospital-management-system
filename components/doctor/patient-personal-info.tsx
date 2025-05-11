@@ -1,19 +1,8 @@
 'use client'
 
 import React from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Calendar,
-  User,
-  Phone,
-  MapPin,
-  Droplet,
-} from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Calendar, User, Phone, MapPin, Droplet } from 'lucide-react'
 
 interface PatientPersonalInfoProps {
   patientInfo: {
@@ -50,14 +39,18 @@ export function PatientPersonalInfo({ patientInfo }: PatientPersonalInfoProps) {
             <span className="text-muted-foreground">Date of Birth</span>
             <span className="font-medium flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              {patientInfo.users?.date_of_birth ? new Date(patientInfo.users?.date_of_birth).toLocaleDateString() : "N/A"}
+              {patientInfo.users?.date_of_birth
+                ? new Date(
+                    patientInfo.users?.date_of_birth,
+                  ).toLocaleDateString()
+                : 'N/A'}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">Blood Type</span>
             <span className="font-medium flex items-center gap-1">
               <Droplet className="h-3.5 w-3.5 text-muted-foreground" />
-              {patientInfo.blood_type || "Not recorded"}
+              {patientInfo.blood_type || 'Not recorded'}
             </span>
           </div>
         </div>
@@ -67,20 +60,20 @@ export function PatientPersonalInfo({ patientInfo }: PatientPersonalInfoProps) {
             <span className="text-muted-foreground">Phone Number</span>
             <span className="font-medium flex items-center gap-1">
               <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-              {patientInfo.users?.phone_number || "Not provided"}
+              {patientInfo.users?.phone_number || 'Not provided'}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">National ID</span>
             <span className="font-medium">
-              {patientInfo.users?.national_id || "Not provided"}
+              {patientInfo.users?.national_id || 'Not provided'}
             </span>
           </div>
           <div className="flex flex-col">
             <span className="text-muted-foreground">Address</span>
             <span className="font-medium flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-              {patientInfo.users?.address || "Not provided"}
+              {patientInfo.users?.address || 'Not provided'}
             </span>
           </div>
         </div>

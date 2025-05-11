@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { DoorOpen, Loader2 } from 'lucide-react'
-import { Progress } from "@/components/ui/progress"
+import { Progress } from '@/components/ui/progress'
 
 interface Room {
   room_id: string
@@ -50,46 +50,53 @@ const RoomAvailabilityTable: React.FC = () => {
         const roomsResponse = await fetch('/api/rooms')
         if (!roomsResponse.ok) throw new Error('Failed to fetch rooms')
         const roomsData = await roomsResponse.json()
-        
+
         const admissionsResponse = await fetch('/api/admission')
-        if (!admissionsResponse.ok) throw new Error('Failed to fetch admissions')
+        if (!admissionsResponse.ok)
+          throw new Error('Failed to fetch admissions')
         const admissionsData = await admissionsResponse.json()
-        
+
         const today = new Date()
         today.setHours(0, 0, 0, 0) // Set to beginning of today
-        
-        const activeAdmissions = admissionsData.data ? 
-          admissionsData.data.filter((admission: Admission) => {
-            // Consider active if:
-            // 1. discharge_date is null OR 
-            // 2. discharge_date is in the future
-            // AND exclude those where discharge_date is in the past
-            return (admission.discharge_date === null || 
-                   new Date(admission.discharge_date) > today) &&
-                   !(admission.discharge_date && new Date(admission.discharge_date) < today);
-          }) : 
-          [];
-        
+
+        const activeAdmissions = admissionsData.data
+          ? admissionsData.data.filter((admission: Admission) => {
+              // Consider active if:
+              // 1. discharge_date is null OR
+              // 2. discharge_date is in the future
+              // AND exclude those where discharge_date is in the past
+              return (
+                (admission.discharge_date === null ||
+                  new Date(admission.discharge_date) > today) &&
+                !(
+                  admission.discharge_date &&
+                  new Date(admission.discharge_date) < today
+                )
+              )
+            })
+          : []
+
         const admissionsByRoom: Record<string, number> = {}
         activeAdmissions.forEach((admission: Admission) => {
           if (admission.room_id) {
-            admissionsByRoom[admission.room_id] = (admissionsByRoom[admission.room_id] || 0) + 1
+            admissionsByRoom[admission.room_id] =
+              (admissionsByRoom[admission.room_id] || 0) + 1
           }
         })
-        
+
         const roomsWithAvailability = roomsData.map((room: Room) => {
           const currentOccupancy = admissionsByRoom[room.room_id] || 0
           const availableBeds = Math.max(0, room.capacity - currentOccupancy)
           const occupancyPercentage = (currentOccupancy / room.capacity) * 100
-          
+
           return {
             ...room,
             current_occupancy: currentOccupancy,
             available_beds: availableBeds,
-            occupancy_percentage: occupancyPercentage
+            occupancy_percentage: occupancyPercentage,
           }
         })
-        
+
         setRooms(roomsWithAvailability)
       } catch (err: any) {
         console.error('Error fetching data:', err)
@@ -103,27 +110,31 @@ const RoomAvailabilityTable: React.FC = () => {
   }, [])
 
   const getAvailabilityBadge = (room: Room) => {
-    if (room.available_beds === 0) return <Badge variant="destructive">Full</Badge>
-    if (room.available_beds === room.capacity) return <Badge variant="outline">Empty</Badge>
+    if (room.available_beds === 0)
+      return <Badge variant="destructive">Full</Badge>
+    if (room.available_beds === room.capacity)
+      return <Badge variant="outline">Empty</Badge>
     return <Badge variant="secondary">{room.available_beds} available</Badge>
   }
 
-  if (isLoading) return (
-    <Card>
-      <CardContent className="p-6 flex justify-center items-center">
-        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-        Loading room availability...
-      </CardContent>
-    </Card>
-  )
+  if (isLoading)
+    return (
+      <Card>
+        <CardContent className="p-6 flex justify-center items-center">
+          <Loader2 className="h-5 w-5 animate-spin mr-2" />
+          Loading room availability...
+        </CardContent>
+      </Card>
+    )
 
-  if (error) return (
-    <Card>
-      <CardContent className="p-6 text-center text-red-500">
-        Error loading room data: {error}
-      </CardContent>
-    </Card>
-  )
+  if (error)
+    return (
+      <Card>
+        <CardContent className="p-6 text-center text-red-500">
+          Error loading room data: {error}
+        </CardContent>
+      </Card>
+    )
 
   return (
     <Card>
@@ -160,15 +171,21 @@ const RoomAvailabilityTable: React.FC = () => {
                     <TableCell>
                       <div className="w-full">
                         <div className="flex justify-between text-xs mb-1">
-                          <span>{room.current_occupancy || 0} / {room.capacity}</span>
-                          <span>{Math.round(room.occupancy_percentage || 0)}%</span>
+                          <span>
+                            {room.current_occupancy || 0} / {room.capacity}
+                          </span>
+                          <span>
+                            {Math.round(room.occupancy_percentage || 0)}%
+                          </span>
                         </div>
-                        <Progress 
-                          value={room.occupancy_percentage || 0} 
+                        <Progress
+                          value={room.occupancy_percentage || 0}
                           className={
-                            (room.occupancy_percentage || 0) === 100 ? "bg-red-200" : 
-                            (room.occupancy_percentage || 0) > 80 ? "bg-amber-200" : 
-                            "bg-green-200"
+                            (room.occupancy_percentage || 0) === 100
+                              ? 'bg-red-200'
+                              : (room.occupancy_percentage || 0) > 80
+                                ? 'bg-amber-200'
+                                : 'bg-green-200'
                           }
                         />
                       </div>

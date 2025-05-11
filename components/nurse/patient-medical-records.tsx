@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface MedicalRecord {
   record_id?: string | number
@@ -39,12 +39,14 @@ interface MedicalRecord {
   visit_date: string
   patient_status: string
   visit_status: string
-  doctor_id: {
-    users?: {
-      first_name: string
-      last_name: string
-    }
-  } | number  // Can be either an object with users or just a number
+  doctor_id:
+    | {
+        users?: {
+          first_name: string
+          last_name: string
+        }
+      }
+    | number // Can be either an object with users or just a number
   diagnosis?: string
   treatment?: string
   notes?: string
@@ -70,45 +72,47 @@ interface PatientMedicalRecordsProps {
 // Helper functions extracted for cleaner component code
 const formatDate = (dateString: string) => {
   try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
   } catch (e) {
-    return dateString;
+    return dateString
   }
 }
 
 const getStatusVariant = (status: string) => {
-  if (!status) return 'default';
-  
-  const statusLower = status.toLowerCase();
-  if (statusLower === 'completed') return 'success';
-  if (statusLower === 'scheduled') return 'secondary';
-  if (statusLower === 'cancelled') return 'destructive';
-  return 'default';
+  if (!status) return 'default'
+
+  const statusLower = status.toLowerCase()
+  if (statusLower === 'completed') return 'success'
+  if (statusLower === 'scheduled') return 'secondary'
+  if (statusLower === 'cancelled') return 'destructive'
+  return 'default'
 }
 
 const getDoctorName = (record: MedicalRecord) => {
   if (record.medical_staff?.users) {
-    return `Dr. ${record.medical_staff.users.first_name} ${record.medical_staff.users.last_name}`;
+    return `Dr. ${record.medical_staff.users.first_name} ${record.medical_staff.users.last_name}`
   }
-  return typeof record.doctor_id === 'number' ? `Doctor ID: ${record.doctor_id}` : 'Unknown Doctor';
+  return typeof record.doctor_id === 'number'
+    ? `Doctor ID: ${record.doctor_id}`
+    : 'Unknown Doctor'
 }
 
 // Extracted component for record details
-function RecordDetails({ 
-  record, 
-  isLoading, 
-  error, 
-  onClose
-}: { 
-  record: MedicalRecord, 
-  isLoading: boolean, 
-  error: string | null,
-  onClose: () => void,
+function RecordDetails({
+  record,
+  isLoading,
+  error,
+  onClose,
+}: {
+  record: MedicalRecord
+  isLoading: boolean
+  error: string | null
+  onClose: () => void
 }) {
   return (
     <Card className="mb-4 border border-primary/20 shadow-md">
@@ -120,7 +124,9 @@ function RecordDetails({
             </CardTitle>
             <CardDescription>
               {formatDate(record.visit_date)} -{' '}
-              <Badge variant={getStatusVariant(record.visit_status)}>{record.visit_status}</Badge>
+              <Badge variant={getStatusVariant(record.visit_status)}>
+                {record.visit_status}
+              </Badge>
             </CardDescription>
           </div>
           <Button
@@ -137,12 +143,21 @@ function RecordDetails({
 
       <CardContent className="space-y-4 text-sm pt-4">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-4" aria-live="polite">
-            <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" aria-hidden="true" />
+          <div
+            className="flex flex-col items-center justify-center py-4"
+            aria-live="polite"
+          >
+            <Loader2
+              className="h-6 w-6 animate-spin text-primary mb-2"
+              aria-hidden="true"
+            />
             <p>Loading record details...</p>
           </div>
         ) : error ? (
-          <div className="text-destructive bg-destructive/10 p-3 rounded-md flex items-center gap-2" role="alert">
+          <div
+            className="text-destructive bg-destructive/10 p-3 rounded-md flex items-center gap-2"
+            role="alert"
+          >
             <AlertCircle className="h-4 w-4" />
             <p>Error: {error}</p>
           </div>
@@ -150,7 +165,9 @@ function RecordDetails({
           <Tabs defaultValue="details">
             <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="treatment">Treatment & Medication</TabsTrigger>
+              <TabsTrigger value="treatment">
+                Treatment & Medication
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="details" className="space-y-4 pt-4">
@@ -178,7 +195,9 @@ function RecordDetails({
                   <h4 className="text-sm font-medium mb-1 text-muted-foreground">
                     Symptoms
                   </h4>
-                  <p className="p-2 bg-muted/20 rounded-md">{record.symptoms}</p>
+                  <p className="p-2 bg-muted/20 rounded-md">
+                    {record.symptoms}
+                  </p>
                 </div>
               )}
 
@@ -188,17 +207,21 @@ function RecordDetails({
                     <Stethoscope className="h-3.5 w-3.5" aria-hidden="true" />
                     Diagnosis
                   </h4>
-                  <p className="p-2 bg-muted/20 rounded-md">{record.diagnosis}</p>
+                  <p className="p-2 bg-muted/20 rounded-md">
+                    {record.diagnosis}
+                  </p>
                 </div>
               )}
-              
+
               {record.created_at && (
                 <div>
                   <h4 className="text-sm font-medium mb-1 flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
                     Record Created
                   </h4>
-                  <p className="text-xs text-muted-foreground">{formatDate(record.created_at)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDate(record.created_at)}
+                  </p>
                 </div>
               )}
             </TabsContent>
@@ -241,13 +264,16 @@ function RecordDetails({
           </Tabs>
         )}
       </CardContent>
-
     </Card>
   )
 }
 
-export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsProps) {
-  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
+export function PatientMedicalRecords({
+  medicalRecords,
+}: PatientMedicalRecordsProps) {
+  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(
+    null,
+  )
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isLoadingRecord, setIsLoadingRecord] = useState(false)
   const [recordError, setRecordError] = useState<string | null>(null)
@@ -272,7 +298,9 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
     } catch (error) {
       console.error('Failed to fetch record details:', error)
       setRecordError(
-        error instanceof Error ? error.message : 'Failed to load record details'
+        error instanceof Error
+          ? error.message
+          : 'Failed to load record details',
       )
     } finally {
       setIsLoadingRecord(false)
@@ -289,7 +317,6 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
     }
   }
 
-
   return (
     <Card className="shadow-sm">
       <CardHeader>
@@ -301,7 +328,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
       <CardContent>
         <div className="space-y-4">
           {selectedRecord && (
-            <RecordDetails 
+            <RecordDetails
               record={selectedRecord}
               isLoading={isLoadingRecord}
               error={recordError}
@@ -321,21 +348,26 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                        <Calendar
+                          className="h-3.5 w-3.5 text-primary"
+                          aria-hidden="true"
+                        />
                         <span className="font-medium">
                           {formatDate(record.visit_date)}
                         </span>
                       </div>
-                      <Badge
-                        variant={getStatusVariant(record.visit_status)}
-                      >
+                      <Badge variant={getStatusVariant(record.visit_status)}>
                         {record.visit_status}
                       </Badge>
                     </div>
                     <div className="flex justify-between items-center mt-1.5">
                       <div className="text-muted-foreground">
-                        {typeof record.doctor_id === 'object' && record.doctor_id?.users ? (
-                          <span>Dr. {record.doctor_id.users.first_name} {record.doctor_id.users.last_name}</span>
+                        {typeof record.doctor_id === 'object' &&
+                        record.doctor_id?.users ? (
+                          <span>
+                            Dr. {record.doctor_id.users.first_name}{' '}
+                            {record.doctor_id.users.last_name}
+                          </span>
                         ) : (
                           <span>Patient Status: {record.patient_status}</span>
                         )}
@@ -343,7 +375,9 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                       {record.diagnosis && (
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Stethoscope className="h-3 w-3" aria-hidden="true" />
-                          <span className="max-w-[150px] truncate">{record.diagnosis}</span>
+                          <span className="max-w-[150px] truncate">
+                            {record.diagnosis}
+                          </span>
                         </span>
                       )}
                     </div>

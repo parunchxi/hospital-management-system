@@ -31,11 +31,12 @@ export default function PatientDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [patientResponse, appointmentsResponse, billingResponse] = await Promise.all([
-        fetch('/api/patients/me'),
-        fetch('/api/appointments'),
-        fetch('/api/billing/patient/me'),
-      ])
+      const [patientResponse, appointmentsResponse, billingResponse] =
+        await Promise.all([
+          fetch('/api/patients/me'),
+          fetch('/api/appointments'),
+          fetch('/api/billing/patient/me'),
+        ])
 
       if (!patientResponse.ok) {
         throw new Error('Failed to fetch patient profile')
@@ -73,8 +74,11 @@ export default function PatientDashboard() {
         </h1>
       </header>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <PatientInfoCard patientProfile={patientProfile} refreshData={fetchData} />
-        <AppointmentCalendarCard appointments={appointments}/>
+        <PatientInfoCard
+          patientProfile={patientProfile}
+          refreshData={fetchData}
+        />
+        <AppointmentCalendarCard appointments={appointments} />
         <UpcomingAppointmentsTable appointments={appointments} />
       </section>
 

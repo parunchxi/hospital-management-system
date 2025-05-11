@@ -1,65 +1,80 @@
-import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PackageX, Plus, AlertCircle, Loader2 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { useState } from 'react'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { PackageX, Plus, AlertCircle, Loader2 } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 interface Medicine {
-  medicine_id: string;
-  name: string;
-  category: string;
-  description: string;
-  unit: string;
-  quantity: number;
-  min_stock_level: number;
-  supplier: string;
-  expiry_date: string;
-  updated_at: string;
+  medicine_id: string
+  name: string
+  category: string
+  description: string
+  unit: string
+  quantity: number
+  min_stock_level: number
+  supplier: string
+  expiry_date: string
+  updated_at: string
 }
 
 interface Props {
-  medicines: Medicine[];
-  onRestock: (medicine: Medicine) => void;
+  medicines: Medicine[]
+  onRestock: (medicine: Medicine) => void
 }
 
 export default function OutOfStockSection({ medicines, onRestock }: Props) {
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
-  const [addAmount, setAddAmount] = useState<number>(10); // Default to 10 for convenience
-  const [loading, setLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false)
+  const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(
+    null,
+  )
+  const [addAmount, setAddAmount] = useState<number>(10) // Default to 10 for convenience
+  const [loading, setLoading] = useState(false)
 
   const handleRestockClick = (medicine: Medicine) => {
-    setSelectedMedicine(medicine);
-    setAddAmount(10); // Reset amount to default
-    setShowDialog(true);
-  };
+    setSelectedMedicine(medicine)
+    setAddAmount(10) // Reset amount to default
+    setShowDialog(true)
+  }
 
   const handleAddAmount = async () => {
     if (!selectedMedicine || addAmount <= 0) {
-      toast.error("Please enter a valid amount greater than 0.");
-      return;
+      toast.error('Please enter a valid amount greater than 0.')
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     try {
       await onRestock({
         ...selectedMedicine,
-        quantity: addAmount - 1 // Subtract 1 because onRestock adds 1 internally
-      });
-      setShowDialog(false);
-      toast.success(`Added ${addAmount} units to ${selectedMedicine.name}`);
+        quantity: addAmount - 1, // Subtract 1 because onRestock adds 1 internally
+      })
+      setShowDialog(false)
+      toast.success(`Added ${addAmount} units to ${selectedMedicine.name}`)
     } catch (error) {
-      toast.error("An error occurred while updating the quantity.");
+      toast.error('An error occurred while updating the quantity.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (medicines.length === 0) {
     return (
@@ -71,12 +86,13 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
             </div>
             <h3 className="mt-4 text-lg font-medium">No Out of Stock Items</h3>
             <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-              All medicines are currently in stock. Good job maintaining inventory levels!
+              All medicines are currently in stock. Good job maintaining
+              inventory levels!
             </p>
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -100,10 +116,16 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
         <CardContent>
           {medicines.length > 6 ? (
             <ScrollArea className="h-[310px] pr-4">
-              <OutOfStockGrid medicines={medicines} onRestock={handleRestockClick} />
+              <OutOfStockGrid
+                medicines={medicines}
+                onRestock={handleRestockClick}
+              />
             </ScrollArea>
           ) : (
-            <OutOfStockGrid medicines={medicines} onRestock={handleRestockClick} />
+            <OutOfStockGrid
+              medicines={medicines}
+              onRestock={handleRestockClick}
+            />
           )}
         </CardContent>
       </Card>
@@ -121,21 +143,27 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
               )}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-4">
             {selectedMedicine && (
               <div className="mb-4 bg-muted/30 p-4 rounded-lg border border-muted">
-                <div className="text-sm font-medium mb-1 text-muted-foreground">Medicine</div>
-                <div className="text-lg font-semibold">{selectedMedicine.name}</div>
-                <div className="text-sm text-muted-foreground">{selectedMedicine.category} • {selectedMedicine.unit}</div>
-                
+                <div className="text-sm font-medium mb-1 text-muted-foreground">
+                  Medicine
+                </div>
+                <div className="text-lg font-semibold">
+                  {selectedMedicine.name}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {selectedMedicine.category} • {selectedMedicine.unit}
+                </div>
+
                 <div className="mt-2 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs font-medium py-1 px-2 rounded border border-red-200 dark:border-red-800/30 flex items-center">
                   <AlertCircle className="h-3.5 w-3.5 mr-1.5" />
                   Currently out of stock
                 </div>
               </div>
             )}
-            
+
             <div className="space-y-3">
               <Label htmlFor="amount" className="text-sm font-medium">
                 Amount to Add
@@ -144,12 +172,14 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
                 id="amount"
                 type="number"
                 value={addAmount || ''}
-                onChange={(e) => setAddAmount(Math.max(0, Number(e.target.value)))}
+                onChange={(e) =>
+                  setAddAmount(Math.max(0, Number(e.target.value)))
+                }
                 min={1}
                 className="w-full"
                 placeholder="Enter quantity"
               />
-              
+
               {selectedMedicine && addAmount > 0 && (
                 <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-md border border-muted">
                   <div className="flex justify-between">
@@ -158,7 +188,9 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
                   </div>
                   <div className="flex justify-between mt-1">
                     <span>Adding:</span>
-                    <span className="font-medium text-green-600 dark:text-green-500">+{addAmount}</span>
+                    <span className="font-medium text-green-600 dark:text-green-500">
+                      +{addAmount}
+                    </span>
                   </div>
                   <div className="border-t border-muted mt-2 pt-2 flex justify-between">
                     <span>New stock level:</span>
@@ -168,7 +200,7 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
               )}
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -198,7 +230,7 @@ export default function OutOfStockSection({ medicines, onRestock }: Props) {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }
 
 function OutOfStockGrid({ medicines, onRestock }: Props) {
@@ -216,7 +248,7 @@ function OutOfStockGrid({ medicines, onRestock }: Props) {
                   Out of Stock
                 </span>
               </div>
-              
+
               <div className="text-sm text-muted-foreground">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-red-600 dark:text-red-400 font-medium">
@@ -224,9 +256,9 @@ function OutOfStockGrid({ medicines, onRestock }: Props) {
                   </span>
                   <span className="text-xs">{medicine.unit}</span>
                 </div>
-                
+
                 <div className="mt-3 pt-3 border-t border-red-100 dark:border-red-900/30">
-                  <Button 
+                  <Button
                     className="w-full bg-red-600 hover:bg-red-700 text-white dark:bg-red-800 dark:hover:bg-red-700"
                     size="sm"
                     onClick={() => onRestock(medicine)}
@@ -241,5 +273,5 @@ function OutOfStockGrid({ medicines, onRestock }: Props) {
         </div>
       ))}
     </div>
-  );
+  )
 }
