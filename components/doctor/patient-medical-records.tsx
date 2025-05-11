@@ -379,13 +379,10 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                         {record.visit_status}
                       </Badge>
                     </div>
+
                     <div className="flex justify-between items-center mt-1.5">
                       <div className="text-muted-foreground">
-                        {record.medical_staff?.users ? (
-                          <span>Dr. {record.medical_staff.users.first_name} {record.medical_staff.users.last_name}</span>
-                        ) : (
-                          <span>Patient Status: {record.patient_status}</span>
-                        )}
+                          <span>Record ID: {record.record_id}</span>
                       </div>
                       {record.diagnosis && (
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -394,6 +391,7 @@ export function PatientMedicalRecords({ medicalRecords }: PatientMedicalRecordsP
                         </span>
                       )}
                     </div>
+                    
                   </button>
                 ))}
               </div>

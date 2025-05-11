@@ -197,29 +197,32 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
 
   return (
     <>
-      <Card>
+      <Card className="relative">
         <CardHeader>
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <Heart className="h-4 w-4 text-muted-foreground" />
             Admission Details
           </CardTitle>
-          {hasAdmissionData && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0 ml-2"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">Edit admission details</span>
-            </Button>
-          )}
+
           {/* Debug output - remove in production */}
           <div className="text-xs text-gray-400 mt-1 break-all hidden">
             {JSON.stringify(admissionInfo)}
           </div>
         </CardHeader>
         <CardContent>
+          {hasAdmissionData && (
+            <div className="absolute top-2 right-2">
+              <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setIsDialogOpen(true)}
+              >
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">Edit admission details</span>
+              </Button>
+            </div>
+          )}
           {isLoading ? (
             <div className="flex justify-center items-center py-6">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground mr-2" />
@@ -239,50 +242,50 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({ patientId, visitDat
                 </div>
               )}
 
-            {displayRoomType && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Room Type:</span>
-                <Badge variant="outline">{displayRoomType}</Badge>
-              </div>
-            )}
+              {displayRoomType && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Room Type:</span>
+                  <Badge variant="outline">{displayRoomType}</Badge>
+                </div>
+              )}
 
-            {displayRoomDept && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Department:</span>
-                <Badge variant="outline">{displayRoomDept}</Badge>
-              </div>
-            )}
+              {displayRoomDept && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Department:</span>
+                  <Badge variant="outline">{displayRoomDept}</Badge>
+                </div>
+              )}
 
-            {displayAdmissionDate && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Admission Date:</span>
-                <span className="text-sm">{new Date(displayAdmissionDate).toLocaleDateString()}</span>
-              </div>
-            )}
+              {displayAdmissionDate && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Admission Date:</span>
+                  <span className="text-sm">{new Date(displayAdmissionDate).toLocaleDateString()}</span>
+                </div>
+              )}
 
-            {/* Display additional admission details if available */}
-            {admissionInfo.discharge_date && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Discharge Date:</span>
-                <span className="text-sm">{new Date(admissionInfo.discharge_date).toLocaleDateString()}</span>
-              </div>
-            )}
+              {/* Display additional admission details if available */}
+              {admissionInfo.discharge_date && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Discharge Date:</span>
+                  <span className="text-sm">{new Date(admissionInfo.discharge_date).toLocaleDateString()}</span>
+                </div>
+              )}
 
-            {admissionInfo.reason && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Reason:</span>
-                <span className="text-sm">{admissionInfo.reason}</span>
-              </div>
-            )}
+              {admissionInfo.reason && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Reason:</span>
+                  <span className="text-sm">{admissionInfo.reason}</span>
+                </div>
+              )}
 
-            {admissionInfo.status && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Status:</span>
-                <Badge variant={admissionInfo.status === "Discharged" ? "secondary" : "default"}>
-                  {admissionInfo.status}
-                </Badge>
-              </div>
-            )}
+              {admissionInfo.status && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Status:</span>
+                  <Badge variant={admissionInfo.status === "Discharged" ? "secondary" : "default"}>
+                    {admissionInfo.status}
+                  </Badge>
+                </div>
+              )}
 
               {admissionInfo.nurse?.user && (
                 <div className="flex justify-between items-center">
