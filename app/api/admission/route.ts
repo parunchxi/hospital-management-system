@@ -129,11 +129,14 @@ export async function POST(req: Request) {
     )
   }
 
+  const now = new Date().toISOString();
+
   const { count, error: currentOccupancyError } = await supabase
     .from('admissions')
     .select('*', { count: 'exact', head: true })
     .eq('room_id', room_id)
-    .is('discharge_date', null)
+    .or(`discharge_date.is.null,discharge_date.gt.${now}`);
+  
 
   if (currentOccupancyError) {
     console.error('Error checking current occupancy:', currentOccupancyError)
