@@ -11,13 +11,13 @@ const supabase = createClient(
 )
 
 type ItemBody = {
-  bill_id: number
-  item_type: 'Medicine' | 'Treatment'
-  item_id_ref: number
-  description: string
-  quantity: number
-  unit_price: number
-}
+  bill_id     : number;
+  item_type   : 'Medicine' | 'Treatment' | 'Rooom';   
+  item_id_ref : number;
+  description : string;
+  quantity    : number;
+  unit_price  : number;
+};
 
 export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as ItemBody | null
