@@ -7,6 +7,7 @@ import UpcomingAppointmentsTable from '@/components/patient/upcoming-appointment
 import BillingSummaryTable from '@/components/patient/billing-summary-table'
 import SummaryStatsCard from '@/components/patient/summary-stats-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getGreeting } from '@/utils/greeting'
 
 function SkeletonLoader() {
   return (
@@ -92,9 +93,11 @@ export default function PatientDashboard() {
   return (
     <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Welcome, {patientProfile?.users?.first_name || 'John Doe'}
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {getGreeting()} {patientProfile?.users ? `${patientProfile.users.first_name} ${patientProfile.users.last_name}` : 'John Doe'}
+          </h1>
+        </div>
       </header>
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <PatientInfoCard
