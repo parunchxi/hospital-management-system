@@ -16,6 +16,7 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
 
 interface Appointment {
   date: string
@@ -50,6 +51,16 @@ export default function UpcomingAppointmentsTable({
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'MMMM d, yyyy')
+  }
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'HH:mm')
+  }
+
   return (
     <Card className="sm:col-span-2 order-1 lg:order-none">
       <CardHeader>
@@ -60,7 +71,9 @@ export default function UpcomingAppointmentsTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>#</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
               <TableHead>Doctor</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -68,7 +81,9 @@ export default function UpcomingAppointmentsTable({
           <TableBody>
             {appointments.map((appt, i) => (
               <TableRow key={i} className="text-sm [&>td]:py-3">
-                <TableCell className="font-medium">{appt.visit_date}</TableCell>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{formatDate(appt.visit_date)}</TableCell>
+                <TableCell>{formatTime(appt.visit_date)}</TableCell>
                 <TableCell>
                   {appt.medical_staff.users.first_name}{' '}
                   {appt.medical_staff.users.last_name}
