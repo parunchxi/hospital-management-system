@@ -27,13 +27,34 @@ export default function AppointmentCalendarCard({
     .filter((appt) => appt.visit_status === 'Scheduled')
     .map((appt) => parseISO(appt.visit_date))
 
+  const completedAppointmentDates = appointments
+    .filter((appt) => appt.visit_status === 'Completed')
+    .map((appt) => parseISO(appt.visit_date))
+
+  const canceledAppointmentDates = appointments
+    .filter((appt) => appt.visit_status === 'Canceled')
+    .map((appt) => parseISO(appt.visit_date))
+
   const modifiersClassNames = {
-    appointment: 'bg-blue-500 text-white font-medium rounded-full',
+    appointmentScheduled:
+      'bg-[color:var(--color-yellow)] hover:bg-[color:var(--color-yellow-hover)] text-white font-medium rounded-full',
+    appointmentCompleted:
+      'bg-[color:var(--color-green)] hover:bg-[color:var(--color-green-hover)] text-white font-medium rounded-full',
+    appointmentCanceled:
+      'bg-[color:var(--color-red)] hover:bg-[color:var(--color-red-hover)] text-white font-medium rounded-full',
   }
 
   const modifiers = {
-    appointment: (date: Date) =>
+    appointmentScheduled: (date: Date) =>
       scheduledAppointmentDates.some((appointmentDate) =>
+        isSameDay(date, appointmentDate),
+      ),
+    appointmentCompleted: (date: Date) =>
+      completedAppointmentDates.some((appointmentDate) =>
+        isSameDay(date, appointmentDate),
+      ),
+    appointmentCanceled: (date: Date) =>
+      canceledAppointmentDates.some((appointmentDate) =>
         isSameDay(date, appointmentDate),
       ),
   }
@@ -47,7 +68,7 @@ export default function AppointmentCalendarCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="max-w-xs mx-auto">
+        <div className="max-w-xs mx-auto flex justify-center">
           <Calendar
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}

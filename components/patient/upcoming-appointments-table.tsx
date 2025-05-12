@@ -16,6 +16,7 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
 
 interface Appointment {
   date: string
@@ -40,14 +41,24 @@ export default function UpcomingAppointmentsTable({
   const getStatusVariant = (status: 'Scheduled' | 'Completed' | 'Canceled') => {
     switch (status) {
       case 'Completed':
-        return 'success'
+        return 'bg-[color:var(--color-green)] hover:bg-[color:var(--color-green-hover)] text-white'
       case 'Canceled':
-        return 'destructive'
+        return 'bg-[color:var(--color-red)] hover:bg-[color:var(--color-red-hover)] text-white'
       case 'Scheduled':
-        return 'default'
+        return 'bg-[color:var(--color-yellow)] hover:bg-[color:var(--color-yellow-hover)] text-white'
       default:
-        return 'outline'
+        return 'bg-gray-200 text-black'
     }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'MMMM d, yyyy')
+  }
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'HH:mm')
   }
 
   return (
@@ -60,7 +71,9 @@ export default function UpcomingAppointmentsTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>#</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
               <TableHead>Doctor</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -68,13 +81,15 @@ export default function UpcomingAppointmentsTable({
           <TableBody>
             {appointments.map((appt, i) => (
               <TableRow key={i} className="text-sm [&>td]:py-3">
-                <TableCell className="font-medium">{appt.visit_date}</TableCell>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{formatDate(appt.visit_date)}</TableCell>
+                <TableCell>{formatTime(appt.visit_date)}</TableCell>
                 <TableCell>
                   {appt.medical_staff.users.first_name}{' '}
                   {appt.medical_staff.users.last_name}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusVariant(appt.visit_status)}>
+                  <Badge className={getStatusVariant(appt.visit_status)}>
                     {appt.visit_status}
                   </Badge>
                 </TableCell>

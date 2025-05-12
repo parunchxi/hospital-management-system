@@ -35,7 +35,12 @@ function ToastComponent({
     return () => clearTimeout(timer)
   }, [onClose])
 
-  const bgColor = variant === 'destructive' ? 'bg-red-500' : 'bg-green-500'
+  const bgColor =
+    variant === 'destructive'
+      ? 'bg-[color:var(--color-red)] hover:bg-[color:var(--color-red-hover)]'
+      : variant === 'default'
+        ? 'bg-[color:var(--color-green)] hover:bg-[color:var(--color-green-hover)]'
+        : 'bg-[color:var(--color-yellow)] hover:bg-[color:var(--color-yellow-hover)]'
 
   return (
     <div
