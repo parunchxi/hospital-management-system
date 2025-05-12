@@ -69,55 +69,51 @@ const MedicineStockTable: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-0">
-        <div className="overflow-auto max-h-[250px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-muted">
-              <TableRow>
+        <div className="overflow-auto max-h-[350px]">
+          <Table className="border-collapse border-spacing-0">
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead>#</TableHead>
                 <TableHead>Medicine Name</TableHead>
-                <TableHead>Current Stock</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-center">Current Stock</TableHead>
+                <TableHead className="text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {medicineStock.length > 0 ? (
-                medicineStock.map((medicine) => {
+                medicineStock.map((medicine, i) => {
                   let status = 'OK'
-                  let variant = 'outline'
+                  let variant = 'bg-green-500 text-white'
 
                   if (medicine.quantity === 0) {
                     status = 'Out of Stock'
-                    variant = 'destructive'
+                    variant = 'bg-red-500 text-white'
                   } else if (medicine.quantity < medicine.min_stock_level) {
                     status = 'Low'
-                    variant = 'warning'
+                    variant = 'bg-yellow-500 text-white'
                   }
 
                   return (
-                    <TableRow key={medicine.id || medicine.medicine_id}>
+                    <TableRow
+                      key={medicine.id || medicine.medicine_id}
+                      className={`text-sm [&>td]:py-3 ${
+                        i % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                      } hover:bg-gray-100 transition-colors`}
+                    >
+                      <TableCell>{i + 1}</TableCell>
                       <TableCell>{medicine.name}</TableCell>
                       <TableCell className="text-center">
                         {medicine.quantity}
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge
-                          variant={
-                            status === 'Low' ? 'outline' : (variant as any)
-                          }
-                          className={
-                            status === 'Low'
-                              ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
-                              : ''
-                          }
-                        >
-                          {status}
-                        </Badge>
+                        <Badge className={variant}>{status}</Badge>
                       </TableCell>
                     </TableRow>
                   )
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-4">
+                  <TableCell colSpan={4} className="text-center py-4">
                     No medicine stock available
                   </TableCell>
                 </TableRow>

@@ -41,11 +41,11 @@ export default function UpcomingAppointmentsTable({
   const getStatusVariant = (status: 'Scheduled' | 'Completed' | 'Canceled') => {
     switch (status) {
       case 'Completed':
-        return 'bg-[color:var(--color-green)] hover:bg-[color:var(--color-green-hover)] text-white'
+        return 'bg-green-500 text-white'
       case 'Canceled':
-        return 'bg-[color:var(--color-red)] hover:bg-[color:var(--color-red-hover)] text-white'
+        return 'bg-red-500 text-white'
       case 'Scheduled':
-        return 'bg-[color:var(--color-yellow)] hover:bg-[color:var(--color-yellow-hover)] text-white'
+        return 'bg-yellow-500 text-white'
       default:
         return 'bg-gray-200 text-black'
     }
@@ -67,36 +67,43 @@ export default function UpcomingAppointmentsTable({
         <CardTitle>Upcoming Appointments</CardTitle>
         <CardDescription>Your confirmed doctor visits</CardDescription>
       </CardHeader>
-      <CardContent className="pl-2px-6 py-4 overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Doctor</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {appointments.map((appt, i) => (
-              <TableRow key={i} className="text-sm [&>td]:py-3">
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{formatDate(appt.visit_date)}</TableCell>
-                <TableCell>{formatTime(appt.visit_date)}</TableCell>
-                <TableCell>
-                  {appt.medical_staff.users.first_name}{' '}
-                  {appt.medical_staff.users.last_name}
-                </TableCell>
-                <TableCell>
-                  <Badge className={getStatusVariant(appt.visit_status)}>
-                    {appt.visit_status}
-                  </Badge>
-                </TableCell>
+      <CardContent className="px-0">
+        <div className="overflow-auto max-h-[350px]">
+          <Table className="border-collapse border-spacing-0">
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead>#</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Doctor</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {appointments.map((appt, i) => (
+                <TableRow
+                  key={i}
+                  className={`text-sm [&>td]:py-3 ${
+                    i % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                  } hover:bg-gray-100 transition-colors`}
+                >
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell>{formatDate(appt.visit_date)}</TableCell>
+                  <TableCell>{formatTime(appt.visit_date)}</TableCell>
+                  <TableCell>
+                    {appt.medical_staff.users.first_name}{' '}
+                    {appt.medical_staff.users.last_name}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusVariant(appt.visit_status)}>
+                      {appt.visit_status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   )
