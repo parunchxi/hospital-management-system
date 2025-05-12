@@ -8,6 +8,7 @@ import RoomAvailabilityTable from '@/components/doctor/free-rooms'
 import DoctorInfoCard from '@/components/doctor/doctor-info'
 import FloatingActionMenu from '@/components/doctor/floating-action-menu'
 import DoctorCalendar from '@/components/doctor/calendar'
+import { getGreeting } from '@/utils/greeting'
 
 // Define proper interface for patient records
 interface PatientRecord {
@@ -37,7 +38,7 @@ export default function DoctorDashboard() {
           role="banner"
         >
           <h1 className="text-3xl font-bold tracking-tight">
-            👋 Hello, Dr. <DoctorInfoCard type="name" />!
+            {getGreeting()} <DoctorInfoCard type="name" />
           </h1>
         </header>
 
