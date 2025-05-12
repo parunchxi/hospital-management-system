@@ -14,7 +14,7 @@ export default function NotFound() {
         404 - Page Not Found
       </h1>
       <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-8">
-        The page you're looking for couldn't be found.
+        The page you&apos;re looking for couldn&apos;t be found.
       </p>
       <div className="flex justify-center gap-4">
         <Button onClick={() => router.push('/')} variant="secondary" size="lg">
