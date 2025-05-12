@@ -46,7 +46,9 @@ export default async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <span className="text-sm text-muted-foreground">Hey, {user.email}!</span>
+      <span className="text-sm text-muted-foreground sm:grid hidden">
+        {user.email}
+      </span>
       <form action={signOutAction}>
         <Button type="submit" variant="outline" size="sm">
           Sign out
