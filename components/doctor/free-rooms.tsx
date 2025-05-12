@@ -36,6 +36,7 @@ interface Room {
 
 interface Admission {
   room_id: string
+  admission_date: string
   discharge_date: string | null
 }
 
@@ -61,17 +62,15 @@ const RoomAvailabilityTable: React.FC = () => {
 
         const activeAdmissions = admissionsData.data
           ? admissionsData.data.filter((admission: Admission) => {
-              // Consider active if:
-              // 1. discharge_date is null OR
-              // 2. discharge_date is in the future
-              // AND exclude those where discharge_date is in the past
+              const admissionDate = new Date(admission.admission_date)
+              const dischargeDate = admission.discharge_date
+                ? new Date(admission.discharge_date)
+                : null
+
+              // Consider active if today is between admission_date and discharge_date
               return (
-                (admission.discharge_date === null ||
-                  new Date(admission.discharge_date) > today) &&
-                !(
-                  admission.discharge_date &&
-                  new Date(admission.discharge_date) < today
-                )
+                admissionDate <= today &&
+                (dischargeDate === null || dischargeDate >= today)
               )
             })
           : []
