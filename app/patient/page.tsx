@@ -8,6 +8,7 @@ import BillingSummaryTable from '@/components/patient/billing-summary-table'
 import SummaryStatsCard from '@/components/patient/summary-stats-card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getGreeting } from '@/utils/greeting'
+import ErrorPage from '@/app/error'
 
 function SkeletonLoader() {
   return (
@@ -88,14 +89,19 @@ export default function PatientDashboard() {
     return <SkeletonLoader />
   }
 
-  if (error) return <div>Failed to load data: {error}</div>
+  if (error) {
+    return <ErrorPage error={new Error(error)} reset={fetchData} />
+  }
 
   return (
     <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {getGreeting()} {patientProfile?.users ? `${patientProfile.users.first_name} ${patientProfile.users.last_name}` : 'John Doe'}
+            {getGreeting()}{' '}
+            {patientProfile?.users
+              ? `${patientProfile.users.first_name} ${patientProfile.users.last_name}`
+              : 'John Doe'}
           </h1>
         </div>
       </header>
