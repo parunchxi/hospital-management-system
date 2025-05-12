@@ -79,13 +79,12 @@ export default function PatientDashboard() {
           refreshData={fetchData}
         />
         <AppointmentCalendarCard appointments={appointments} />
-        <UpcomingAppointmentsTable appointments={appointments} />
+        <section className="hidden sm:grid gap-4 md:grid-cols-2 col-span-2">
+          <SummaryStatsCard appointments={appointments} billing={billing} />
+        </section>
       </section>
 
-      <section className="hidden sm:grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <SummaryStatsCard appointments={appointments} billing={billing} />
-      </section>
-
+      <UpcomingAppointmentsTable appointments={appointments} />
       <BillingSummaryTable billing={billing} appointments={appointments} />
     </div>
   )

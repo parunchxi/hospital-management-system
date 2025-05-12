@@ -40,13 +40,13 @@ export default function UpcomingAppointmentsTable({
   const getStatusVariant = (status: 'Scheduled' | 'Completed' | 'Canceled') => {
     switch (status) {
       case 'Completed':
-        return 'success'
+        return 'bg-[color:var(--color-green)] hover:bg-[color:var(--color-green-hover)] text-white'
       case 'Canceled':
-        return 'destructive'
+        return 'bg-[color:var(--color-red)] hover:bg-[color:var(--color-red-hover)] text-white'
       case 'Scheduled':
-        return 'default'
+        return 'bg-[color:var(--color-yellow)] hover:bg-[color:var(--color-yellow-hover)] text-white'
       default:
-        return 'outline'
+        return 'bg-gray-200 text-black'
     }
   }
 
@@ -74,7 +74,7 @@ export default function UpcomingAppointmentsTable({
                   {appt.medical_staff.users.last_name}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusVariant(appt.visit_status)}>
+                  <Badge className={getStatusVariant(appt.visit_status)}>
                     {appt.visit_status}
                   </Badge>
                 </TableCell>

@@ -44,7 +44,9 @@ interface Props {
 
 export default function BillingSummaryTable({ billing }: Props) {
   const getStatusVariant = (status: 'Paid' | 'Pending') =>
-    status === 'Paid' ? 'default' : 'destructive'
+    status === 'Paid'
+      ? 'bg-[color:var(--color-green)] text-white'
+      : 'bg-[color:var(--color-yellow)] text-white'
 
   // Format date function
   const formatDate = (dateString: string) => {
@@ -80,7 +82,7 @@ export default function BillingSummaryTable({ billing }: Props) {
                   <TableCell className="font-medium">{index + 1}</TableCell>
                   <TableCell>${total_price.toFixed(2)}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(status)}>{status}</Badge>
+                    <Badge className={getStatusVariant(status)}>{status}</Badge>
                   </TableCell>
                   <TableCell>{formatDate(updated_at)}</TableCell>
                   <TableCell className="text-right">
