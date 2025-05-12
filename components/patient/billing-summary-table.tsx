@@ -112,7 +112,7 @@ export default function BillingSummaryTable({ billing }: Props) {
                     <TableCell className="font-medium">
                       BILL-{bill_id}
                     </TableCell>
-                    <TableCell>${total_price.toFixed(2)}</TableCell>
+                    <TableCell>฿{total_price.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge className={getStatusVariant(status)}>
                         {status}
