@@ -6,6 +6,26 @@ import AppointmentCalendarCard from '@/components/patient/appointment-calendar-c
 import UpcomingAppointmentsTable from '@/components/patient/upcoming-appointments-table'
 import BillingSummaryTable from '@/components/patient/billing-summary-table'
 import SummaryStatsCard from '@/components/patient/summary-stats-card'
+import { Skeleton } from '@/components/ui/skeleton'
+
+function SkeletonLoader() {
+  return (
+    <div className="flex flex-col w-full gap-4 px-4 py-10 container mx-auto @container">
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <Skeleton className="h-8 w-1/3" />
+      </header>
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-40" />
+        <Skeleton className="h-40" />
+        <div className="hidden sm:grid gap-4 md:grid-cols-2 col-span-2">
+          <Skeleton className="h-40" />
+        </div>
+      </section>
+      <Skeleton className="h-64" />
+      <Skeleton className="h-64" />
+    </div>
+  )
+}
 
 export default function PatientDashboard() {
   interface PatientProfile {
@@ -63,7 +83,10 @@ export default function PatientDashboard() {
     fetchData()
   }, [fetchData])
 
-  if (loading) return <div>Loading...</div>
+  if (loading) {
+    return <SkeletonLoader />
+  }
+
   if (error) return <div>Failed to load data: {error}</div>
 
   return (
