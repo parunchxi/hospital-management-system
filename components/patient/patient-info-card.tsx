@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { ButtonIcon } from '@/components/ui/edit-btn'
 import { useState } from 'react'
+import { format } from 'date-fns'
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,11 @@ export default function PatientInfoCard({
   const [displayedPhoneNumber, setDisplayedPhoneNumber] = useState(
     user?.phone_number || '',
   )
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'MMMM d, yyyy')
+  }
 
   const handleEditClick = () => {
     setIsDialogOpen(true)
@@ -148,7 +154,10 @@ export default function PatientInfoCard({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span>Date of Birth: {user?.date_of_birth}</span>
+              <span>
+                Date of Birth:{' '}
+                {user?.date_of_birth ? formatDate(user.date_of_birth) : 'N/A'}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <BadgeDollarSign className="h-4 w-4" />
