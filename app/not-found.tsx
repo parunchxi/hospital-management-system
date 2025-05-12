@@ -10,21 +10,17 @@ export default function NotFound() {
 
   return (
     <section className="text-center py-20 px-6 md:px-12">
-      <div className="flex flex-col items-center space-y-4">
-        <SearchX className="w-36 h-36 text-destructive" />
-        <h1 className="text-3xl md:text-5xl font-bold text-destructive">
-          404 - Page Not Found
-        </h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          The page you're looking for couldn't be found. It might have been
-          moved or deleted.
-        </p>
-      </div>
-      <div className="flex justify-center gap-4 mt-8">
-        <Button onClick={() => router.push('/')} variant="default" size="lg">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 text-destructive">
+        404 - Page Not Found
+      </h1>
+      <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-8">
+        The page you're looking for couldn't be found.
+      </p>
+      <div className="flex justify-center gap-4">
+        <Button onClick={() => router.push('/')} variant="secondary" size="lg">
           Go to Home
         </Button>
-        <Button onClick={() => router.back()} variant="secondary" size="lg">
+        <Button onClick={() => router.back()} variant="destructive" size="lg">
           Go Back
         </Button>
       </div>
