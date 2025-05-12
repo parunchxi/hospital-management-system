@@ -17,7 +17,6 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 
 interface BillingItem {
   item_id: number
@@ -85,7 +84,6 @@ export default function BillingSummaryTable({ billing }: Props) {
               <TableHead>Status</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>Updated At</TableHead>
-              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,7 +100,14 @@ export default function BillingSummaryTable({ billing }: Props) {
                 index,
               ) => (
                 <React.Fragment key={bill_id}>
-                  <TableRow className="text-sm [&>td]:py-3">
+                  <TableRow
+                    className={`text-sm [&>td]:py-3 cursor-pointer ${
+                      expandedRows.includes(bill_id)
+                        ? 'bg-[color:var(--color-card)]'
+                        : ''
+                    }`}
+                    onClick={() => toggleRow(bill_id)}
+                  >
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell className="font-medium">
                       BILL-{bill_id}
@@ -115,22 +120,11 @@ export default function BillingSummaryTable({ billing }: Props) {
                     </TableCell>
                     <TableCell>{formatDate(created_at)}</TableCell>
                     <TableCell>{formatDate(updated_at)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => toggleRow(bill_id)}
-                      >
-                        {expandedRows.includes(bill_id)
-                          ? 'Hide Details'
-                          : 'Show More'}
-                      </Button>
-                    </TableCell>
                   </TableRow>
                   {expandedRows.includes(bill_id) && (
                     <TableRow key={`${bill_id}-details`}>
                       <TableCell
-                        colSpan={7}
+                        colSpan={6}
                         className="bg-[color:var(--color-card)]"
                       >
                         <div className="p-4">
