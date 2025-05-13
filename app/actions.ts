@@ -156,8 +156,7 @@ export const signInAction = async (formData: FormData) => {
   } else if (role === 'Admin') {
     return redirect('/admin')
   }
-
-  return redirect('/home')
+  return redirect('/')
 }
 
 export const forgotPasswordAction = async (formData: FormData) => {
@@ -171,7 +170,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/home/reset-password`,
+    redirectTo: `${origin}/auth/callback?redirect_to=/reset-password`,
   })
 
   if (error) {
@@ -202,17 +201,13 @@ export const resetPasswordAction = async (formData: FormData) => {
   if (!password || !confirmPassword) {
     return encodedRedirect(
       'error',
-      '/home/reset-password',
+      '/reset-password',
       'Password and confirm password are required',
     )
   }
 
   if (password !== confirmPassword) {
-    return encodedRedirect(
-      'error',
-      '/home/reset-password',
-      'Passwords do not match',
-    )
+    return encodedRedirect('error', '/reset-password', 'Passwords do not match')
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -220,14 +215,10 @@ export const resetPasswordAction = async (formData: FormData) => {
   })
 
   if (error) {
-    return encodedRedirect(
-      'error',
-      '/home/reset-password',
-      'Password update failed',
-    )
+    return encodedRedirect('error', '/reset-password', 'Password update failed')
   }
 
-  return encodedRedirect('success', '/home/reset-password', 'Password updated')
+  return encodedRedirect('success', '/reset-password', 'Password updated')
 }
 
 export const signOutAction = async () => {
