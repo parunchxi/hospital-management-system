@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { CalendarClock } from 'lucide-react'
+import { format } from 'date-fns'
 
 interface AppointmentsTableProps {
   onRowClick: (record: any) => void
@@ -88,6 +89,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'MMMM d, yyyy')
+  }
+
   if (isLoading)
     return (
       <Card>
@@ -112,7 +118,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
         <div className="overflow-auto max-h-[350px]">
           <Table className="border-collapse border-spacing-0">
             <TableHeader>
-              <TableRow className="bg-muted">
+              <TableRow>
                 <TableHead>#</TableHead>
                 <TableHead>Patient Name</TableHead>
                 <TableHead>Case</TableHead>
@@ -126,9 +132,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 appointments.slice(0, visibleAppointments).map((record, i) => (
                   <TableRow
                     key={record.record_id}
-                    className={`text-sm [&>td]:py-3 cursor-pointer ${
-                      i % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                    } hover:bg-gray-100 transition-colors`}
                     onClick={() => onRowClick(record)}
                   >
                     <TableCell>{i + 1}</TableCell>
@@ -149,7 +152,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     </TableCell>
                     <TableCell>
                       {record.visit_date
-                        ? new Date(record.visit_date).toLocaleDateString()
+                        ? formatDate(record.visit_date)
                         : 'Not scheduled'}
                     </TableCell>
                     <TableCell>
