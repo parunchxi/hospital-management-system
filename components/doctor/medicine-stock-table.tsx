@@ -72,7 +72,7 @@ const MedicineStockTable: React.FC = () => {
         <div className="overflow-auto max-h-[350px]">
           <Table className="border-collapse border-spacing-0">
             <TableHeader>
-              <TableRow className="bg-muted">
+              <TableRow>
                 <TableHead>#</TableHead>
                 <TableHead>Medicine Name</TableHead>
                 <TableHead className="text-center">Current Stock</TableHead>
@@ -94,12 +94,7 @@ const MedicineStockTable: React.FC = () => {
                   }
 
                   return (
-                    <TableRow
-                      key={medicine.id || medicine.medicine_id}
-                      className={`text-sm [&>td]:py-3 ${
-                        i % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                      } hover:bg-gray-100 transition-colors`}
-                    >
+                    <TableRow key={medicine.id || medicine.medicine_id}>
                       <TableCell>{i + 1}</TableCell>
                       <TableCell>{medicine.name}</TableCell>
                       <TableCell className="text-center">
