@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { CalendarClock } from 'lucide-react'
+import { format } from 'date-fns'
 
 interface AppointmentsTableProps {
   onRowClick: (record: any) => void
@@ -65,14 +66,32 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'Completed':
-        return 'success'
+        return 'bg-green-500 text-white'
       case 'Canceled':
-        return 'destructive'
+        return 'bg-red-500 text-white'
       case 'Scheduled':
-        return 'default'
+        return 'bg-yellow-500 text-white'
       default:
-        return 'outline'
+        return 'bg-gray-200 text-black'
     }
+  }
+
+  const getPatientStatusTooltip = (status: string) => {
+    switch (status) {
+      case 'Stable':
+        return 'The patient is in stable condition.'
+      case 'Critical':
+        return 'The patient is in critical condition.'
+      case 'Recovering':
+        return 'The patient is recovering.'
+      default:
+        return 'Unknown patient status.'
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return format(date, 'MMMM d, yyyy')
   }
 
   if (isLoading)
@@ -97,9 +116,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       </CardHeader>
       <CardContent className="px-0">
         <div className="overflow-auto max-h-[350px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-muted">
+          <Table className="border-collapse border-spacing-0">
+            <TableHeader>
               <TableRow>
+                <TableHead>#</TableHead>
                 <TableHead>Patient Name</TableHead>
                 <TableHead>Case</TableHead>
                 <TableHead>Patient Status</TableHead>
@@ -109,42 +129,42 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
             </TableHeader>
             <TableBody>
               {appointments && appointments.length > 0 ? (
-                appointments
-                  .slice(0, visibleAppointments)
-                  .map((record: any) => (
-                    <TableRow
-                      key={record.record_id}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        // alert(`Row clicked, patient data: ${JSON.stringify(record, null, 2)}`);
-                        onRowClick(record)
-                      }}
-                    >
-                      <TableCell>
-                        {record.patients?.users?.first_name}{' '}
-                        {record.patients?.users?.last_name}
-                      </TableCell>
-                      <TableCell>
-                        {record.symptoms || 'Not specified'}
-                      </TableCell>
-                      <TableCell>
+                appointments.slice(0, visibleAppointments).map((record, i) => (
+                  <TableRow
+                    key={record.record_id}
+                    onClick={() => onRowClick(record)}
+                  >
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell>
+                      {record.patients?.users?.first_name}{' '}
+                      {record.patients?.users?.last_name}
+                    </TableCell>
+                    <TableCell>{record.symptoms || 'Not specified'}</TableCell>
+                    <TableCell>
+                      <div
+                        className="tooltip"
+                        data-tooltip={getPatientStatusTooltip(
+                          record.patient_status || 'Unknown',
+                        )}
+                      >
                         {record.patient_status || 'Unknown'}
-                      </TableCell>
-                      <TableCell>
-                        {record.visit_date
-                          ? new Date(record.visit_date).toLocaleDateString()
-                          : 'Not scheduled'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(record.visit_status)}>
-                          {record.visit_status || 'Unknown'}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {record.visit_date
+                        ? formatDate(record.visit_date)
+                        : 'Not scheduled'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusVariant(record.visit_status)}>
+                        {record.visit_status || 'Unknown'}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
+                  <TableCell colSpan={6} className="text-center py-4">
                     No appointments found
                   </TableCell>
                 </TableRow>

@@ -36,6 +36,7 @@ interface Room {
 
 interface Admission {
   room_id: string
+  admission_date: string
   discharge_date: string | null
 }
 
@@ -61,17 +62,15 @@ const RoomAvailabilityTable: React.FC = () => {
 
         const activeAdmissions = admissionsData.data
           ? admissionsData.data.filter((admission: Admission) => {
-              // Consider active if:
-              // 1. discharge_date is null OR
-              // 2. discharge_date is in the future
-              // AND exclude those where discharge_date is in the past
+              const admissionDate = new Date(admission.admission_date)
+              const dischargeDate = admission.discharge_date
+                ? new Date(admission.discharge_date)
+                : null
+
+              // Consider active if today is between admission_date and discharge_date
               return (
-                (admission.discharge_date === null ||
-                  new Date(admission.discharge_date) > today) &&
-                !(
-                  admission.discharge_date &&
-                  new Date(admission.discharge_date) < today
-                )
+                admissionDate <= today &&
+                (dischargeDate === null || dischargeDate >= today)
               )
             })
           : []
@@ -110,11 +109,21 @@ const RoomAvailabilityTable: React.FC = () => {
   }, [])
 
   const getAvailabilityBadge = (room: Room) => {
-    if (room.available_beds === 0)
-      return <Badge variant="destructive">Full</Badge>
-    if (room.available_beds === room.capacity)
-      return <Badge variant="outline">Empty</Badge>
-    return <Badge variant="secondary">{room.available_beds} available</Badge>
+    let status = `${room.available_beds} Available`
+    let variant =
+      'bg-[var(--color-green)] hover:bg-[var(--color-green-hover)] text-white'
+
+    if (room.available_beds === 0) {
+      status = 'Full'
+      variant =
+        'bg-[var(--color-red)] hover:bg-[var(--color-red-hover)] text-white'
+    } else if (((room.available_beds ?? 0) / room.capacity) * 100 <= 50) {
+      status = `${room.available_beds} Available`
+      variant =
+        'bg-[var(--color-yellow)] hover:bg-[var(--color-yellow-hover)] text-white'
+    }
+
+    return <Badge className={variant}>{status}</Badge>
   }
 
   if (isLoading)
@@ -149,9 +158,10 @@ const RoomAvailabilityTable: React.FC = () => {
       </CardHeader>
       <CardContent className="px-0">
         <div className="overflow-auto max-h-[400px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-muted">
+          <Table className="border-collapse border-spacing-0">
+            <TableHeader>
               <TableRow>
+                <TableHead>#</TableHead>
                 <TableHead>Room</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Type</TableHead>
@@ -162,14 +172,15 @@ const RoomAvailabilityTable: React.FC = () => {
             </TableHeader>
             <TableBody>
               {rooms.length > 0 ? (
-                rooms.map((room) => (
+                rooms.map((room, i) => (
                   <TableRow key={room.room_id}>
+                    <TableCell>{i + 1}</TableCell>
                     <TableCell>{room.room_id}</TableCell>
                     <TableCell>{room.departments.name}</TableCell>
                     <TableCell>{room.room_type}</TableCell>
                     <TableCell>{room.capacity}</TableCell>
                     <TableCell>
-                      <div className="w-full">
+                      <div>
                         <div className="flex justify-between text-xs mb-1">
                           <span>
                             {room.current_occupancy || 0} / {room.capacity}
@@ -180,12 +191,14 @@ const RoomAvailabilityTable: React.FC = () => {
                         </div>
                         <Progress
                           value={room.occupancy_percentage || 0}
-                          className={
-                            (room.occupancy_percentage || 0) === 100
-                              ? 'bg-red-200'
-                              : (room.occupancy_percentage || 0) > 80
-                                ? 'bg-amber-200'
-                                : 'bg-green-200'
+                          color={
+                            room.available_beds === 0
+                              ? 'bg-[var(--color-red)]'
+                              : ((room.available_beds ?? 0) / room.capacity) *
+                                    100 <=
+                                  50
+                                ? 'bg-[var(--color-yellow)]'
+                                : 'bg-[var(--color-green)]'
                           }
                         />
                       </div>
@@ -195,7 +208,7 @@ const RoomAvailabilityTable: React.FC = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
+                  <TableCell colSpan={7} className="text-center py-4">
                     No rooms found
                   </TableCell>
                 </TableRow>
