@@ -1,6 +1,4 @@
-export const getGreeting = () => {
-  const hour = new Date().getHours()
-
+export const getGreeting = (hour: number = new Date().getHours()) => {
   const morningGreetings = [
     'Good Morning!',
     'Rise and shine!',
@@ -25,13 +23,13 @@ export const getGreeting = () => {
     'Relax, you’ve earned it!',
   ]
 
+  const randomIndex = (arr: string[]) => Math.floor(hour % arr.length)
+
   if (hour < 12) {
-    return morningGreetings[Math.floor(Math.random() * morningGreetings.length)]
+    return morningGreetings[randomIndex(morningGreetings)]
   } else if (hour < 18) {
-    return afternoonGreetings[
-      Math.floor(Math.random() * afternoonGreetings.length)
-    ]
+    return afternoonGreetings[randomIndex(afternoonGreetings)]
   } else {
-    return eveningGreetings[Math.floor(Math.random() * eveningGreetings.length)]
+    return eveningGreetings[randomIndex(eveningGreetings)]
   }
 }
