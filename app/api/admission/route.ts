@@ -107,12 +107,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid room_id' }, { status: 400 })
   }
 
+  // Check date range validity
+  if (discharge_date && new Date(discharge_date) <= new Date(admission_date)) {
+    return NextResponse.json(
+      { error: 'Discharge date must be after admission date' },
+      { status: 400 },
+    )
+  }
+
   // Check if adding this admission would exceed room capacity at admission time
   const admissionDateTime = new Date(admission_date).toISOString()
   const dischargeDateTime = discharge_date
     ? new Date(discharge_date).toISOString()
     : null
 
+
+  
   // Query to find overlapping admissions - fix the OR condition syntax
   let overlappingQuery = supabase
     .from('admissions')
