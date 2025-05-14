@@ -43,6 +43,12 @@ export async function GET(
     `,
     )
     .eq('patient_id', id)
+    .or(
+      `discharge_date.is.null,discharge_date.gt.${new Date().toISOString()}`
+    ) // Check if discharge_date is null or in the future
+    .lte('admission_date', new Date().toISOString());
+
+
 
   if (error) {
     console.error('Detailed Supabase error:', error) // Log detailed error from Supabase
