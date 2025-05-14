@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -50,6 +50,45 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
   const selectedNurse = nurses.find(
     (nurse) => nurse.staff_id.toString() === admission.nurse_id?.toString(),
   )
+
+  // Extract date and time parts for UI display
+  const getDatePart = (isoString: string) => {
+    return isoString ? isoString.split('T')[0] : '';
+  }
+
+  const getTimePart = (isoString: string) => {
+    if (!isoString) return '';
+    const timePart = isoString.split('T')[1];
+    return timePart ? timePart.substring(0, 5) : ''; // Get HH:MM part
+  }
+
+  // Handler for date change
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'admission_date' | 'discharge_date') => {
+    const { value } = e.target;
+    const timePart = field === 'admission_date' 
+      ? getTimePart(admission.admission_date) || '00:00'
+      : getTimePart(admission.discharge_date) || '00:00';
+    
+    setAdmission((prev: typeof admission) => ({
+      ...prev,
+      [field]: value ? `${value}T${timePart}` : '',
+    }));
+  }
+
+  // Handler for time change
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'admission_date' | 'discharge_date') => {
+    const { value } = e.target;
+    const datePart = field === 'admission_date'
+      ? getDatePart(admission.admission_date)
+      : getDatePart(admission.discharge_date);
+    
+    if (datePart) {
+      setAdmission((prev: typeof admission) => ({
+        ...prev,
+        [field]: `${datePart}T${value || '00:00'}`,
+      }));
+    }
+  }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -146,42 +185,81 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
 
           <Separator className="my-2" />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label
-                htmlFor="admission-date"
-                className="text-sm font-medium flex items-center gap-2"
-              >
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                Admission Date
-              </Label>
-              <Input
-                id="admission-date"
-                name="admission_date"
-                type="date"
-                value={admission.admission_date}
-                onChange={handleAdmissionChange}
-                required
-                className="w-full"
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="admission-date"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Admission Date
+                </Label>
+                <Input
+                  id="admission-date"
+                  name="admission_date"
+                  type="date"
+                  value={getDatePart(admission.admission_date)}
+                  onChange={(e) => handleDateChange(e, 'admission_date')}
+                  required
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="admission-time"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Admission Time
+                </Label>
+                <Input
+                  id="admission-time"
+                  name="admission_time"
+                  type="time"
+                  value={getTimePart(admission.admission_date)}
+                  onChange={(e) => handleTimeChange(e, 'admission_date')}
+                  required
+                  className="w-full"
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="discharge-date"
-                className="text-sm font-medium flex items-center gap-2"
-              >
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                Discharge Date
-              </Label>
-              <Input
-                id="discharge-date"
-                name="discharge_date"
-                type="date"
-                value={admission.discharge_date}
-                onChange={handleAdmissionChange}
-                className="w-full"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="discharge-date"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Discharge Date
+                </Label>
+                <Input
+                  id="discharge-date"
+                  name="discharge_date"
+                  type="date"
+                  value={getDatePart(admission.discharge_date)}
+                  onChange={(e) => handleDateChange(e, 'discharge_date')}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="discharge-time"
+                  className="text-sm font-medium flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Discharge Time
+                </Label>
+                <Input
+                  id="discharge-time"
+                  name="discharge_time"
+                  type="time"
+                  value={getTimePart(admission.discharge_date)}
+                  onChange={(e) => handleTimeChange(e, 'discharge_date')}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         </CardContent>

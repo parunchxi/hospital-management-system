@@ -57,6 +57,41 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   const [medicines, setMedicines] = useState<any[]>([])
   const [loadingMedicines, setLoadingMedicines] = useState(false)
 
+  // Extract date and time parts for UI display
+  const getDatePart = (isoString: string) => {
+    return isoString ? isoString.split('T')[0] : ''
+  }
+
+  const getTimePart = (isoString: string) => {
+    if (!isoString) return ''
+    const timePart = isoString.split('T')[1]
+    return timePart ? timePart.substring(0, 5) : '' // Get HH:MM part
+  }
+
+  // Handler for date change
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target
+    const timePart = getTimePart(appointment.visit_date) || '00:00'
+
+    setAppointment((prev: typeof appointment) => ({
+      ...prev,
+      visit_date: value ? `${value}T${timePart}` : '',
+    }))
+  }
+
+  // Handler for time change
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target
+    const datePart = getDatePart(appointment.visit_date)
+
+    if (datePart) {
+      setAppointment((prev: typeof appointment) => ({
+        ...prev,
+        visit_date: `${datePart}T${value || '00:00'}`,
+      }))
+    }
+  }
+
   // Fetch medicines on component mount
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -90,23 +125,43 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
           <Separator className="my-2" />
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="visit-date"
-              className="text-sm font-medium flex items-center gap-2"
-            >
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              Appointment Date
-            </Label>
-            <Input
-              id="visit-date"
-              name="visit_date"
-              type="date"
-              value={appointment.visit_date}
-              onChange={handleAppointmentChange}
-              required
-              className="w-full"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="visit-date"
+                className="text-sm font-medium flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                Appointment Date
+              </Label>
+              <Input
+                id="visit-date"
+                name="visit_date"
+                type="date"
+                value={getDatePart(appointment.visit_date)}
+                onChange={handleDateChange}
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="visit-time"
+                className="text-sm font-medium flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                Appointment Time
+              </Label>
+              <Input
+                id="visit-time"
+                name="visit_time"
+                type="time"
+                value={getTimePart(appointment.visit_date)}
+                onChange={handleTimeChange}
+                required
+                className="w-full"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -224,43 +279,6 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               placeholder="Enter treatment plan"
             />
           </div>
-          {/* <div className="space-y-2">
-            <Select
-              value={appointment.medicine_prescribed}
-              onValueChange={(val: string) => setAppointment((prev: typeof appointment) => ({ ...prev, medicine_prescribed: val }))}
-              disabled={loadingMedicines}
-            >
-              <SelectTrigger id="medicine" className="min-h-10">
-                <SelectValue placeholder={loadingMedicines ? "Loading medicines..." : "Select medicine"} />
-              </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
-                {loadingMedicines ? (
-                  <SelectItem value="loading" disabled>
-                    Loading medicines...
-                  </SelectItem>
-                ) : medicines.length === 0 ? (
-                  <SelectItem value="none" disabled>
-                    No medicines available
-                  </SelectItem>
-                ) : (
-                  medicines.map((medicine) => (
-                    <SelectItem
-                      key={medicine.medicine_id}
-                      value={`${medicine.name} (${medicine.dosage})`}
-                      className="py-2"
-                    >
-                      <div>
-                        <div className="font-medium">{medicine.name}</div>
-                        <div className="text-xs text-muted-foreground flex justify-between mt-1">
-                          <span>Stock: {medicine.quantity}</span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div> */}
         </CardContent>
       </Card>
 
