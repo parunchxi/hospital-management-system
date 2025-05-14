@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { getUserRole } from '@/utils/get-role'
+import { date } from 'zod'
 
 // example request body
 // {
@@ -121,48 +122,52 @@ export async function POST(req: Request) {
     ? new Date(discharge_date).toISOString()
     : null
 
-
+  // First, log the actual admission being attempted for debugging
+  console.log(`Attempting admission - Room: ${room_id}, Dates: ${admissionDateTime} to ${dischargeDateTime || 'indefinite'}`)
   
-  // Query to find overlapping admissions - fix the OR condition syntax
-  let overlappingQuery = supabase
+  // Do a direct count query to simplify the logic and avoid filter issues
+  const { data: currentAdmissions, error: admissionsError } = await supabase
     .from('admissions')
-    .select('*', { count: 'exact', head: true })
+    .select('admission_id, admission_date, discharge_date')
     .eq('room_id', room_id)
 
-  if (dischargeDateTime) {
-    // If there's a discharge date, we need to find admissions that:
-    // 1. Have no discharge date, OR
-    // 2. Have a discharge date that's after our admission date AND
-    //    Have an admission date that's before our discharge date
-    overlappingQuery = overlappingQuery.or(
-      `discharge_date.is.null,and(discharge_date.gt.${admissionDateTime},admission_date.lt.${dischargeDateTime})`,
-    )
-  } else {
-    // If there's no discharge date, we need to find admissions that:
-    // 1. Have no discharge date, OR
-    // 2. Have a discharge date that's after our admission date
-    overlappingQuery = overlappingQuery.or(
-      `discharge_date.is.null,discharge_date.gt.${admissionDateTime}`,
-    )
-  }
-
-  const { count: overlappingAdmissionsCount, error: overlappingError } =
-    await overlappingQuery
-
-  if (overlappingError) {
-    console.error('Error checking overlapping admissions:', overlappingError)
+  if (admissionsError) {
+    console.error('Error retrieving admissions:', admissionsError)
     return NextResponse.json(
       { error: 'Failed to check room availability' },
       { status: 500 },
     )
   }
 
+  // Log all admissions for this room for debugging
+  console.log(`All admissions for room ${room_id}:`, currentAdmissions)
+  
+  // Count overlapping admissions manually
+  const overlappingCount = currentAdmissions.filter(admission => {
+    // Convert dates to standardized format for comparison
+    const admStart = new Date(admission.admission_date).getTime()
+    const admEnd = admission.discharge_date ? new Date(admission.discharge_date).getTime() : Infinity
+    const newStart = new Date(admissionDateTime).getTime()
+    const newEnd = dischargeDateTime ? new Date(dischargeDateTime).getTime() : Infinity
+    
+    // Check for overlap - basic interval overlap check:
+    // (startA <= endB) AND (endA >= startB)
+    const overlaps = (admStart <= newEnd) && (admEnd >= newStart)
+    
+    if (overlaps) {
+      console.log(`Overlapping admission found:`, admission)
+    }
+    
+    return overlaps
+  }).length
+
+  console.log(`Manual overlapping count: ${overlappingCount}, Room capacity: ${roomCapacity.capacity}`)
+  
   // If adding this admission would exceed capacity
-  if ((overlappingAdmissionsCount || 0) >= roomCapacity.capacity) {
+  if (overlappingCount >= roomCapacity.capacity) {
     return NextResponse.json(
       {
-        error:
-          'Room would be over capacity during the requested admission period',
+        error: `Room would be over capacity during the requested admission period. Current occupancy: ${overlappingCount}, Capacity: ${roomCapacity.capacity}`,
       },
       { status: 400 },
     )
@@ -175,17 +180,9 @@ export async function POST(req: Request) {
       .from('admissions')
       .select('admission_id')
       .eq('patient_id', patient_id)
+      .lte('admission_date', now)
       .or(`discharge_date.is.null,discharge_date.gt.${now}`)
-      .single()
-
-  if (existingAdmissionError && existingAdmissionError.code !== 'PGRST116') {
-    // Ignore "No rows found" error
-    console.error('Error checking existing admission:', existingAdmissionError)
-    return NextResponse.json(
-      { error: 'Failed to check existing admission' },
-      { status: 500 },
-    )
-  }
+      .maybeSingle()
 
   if (existingAdmission) {
     return NextResponse.json(
@@ -231,7 +228,7 @@ export async function GET() {
   }
   const { role } = result
 
-  if (role == 'Admin' || role == 'Doctor') {
+  if (role == 'Admin') {
     const { data, error } = await supabase
       .from('admissions')
       .select(
@@ -249,6 +246,29 @@ export async function GET() {
       )
     }
     return NextResponse.json({ data }, { status: 200 })
+  } else if (role == 'Doctor') {
+    const now = new Date().toISOString()
+
+    const { data, error: doctorError } = await supabase // Changed variable name to avoid redundancy
+      .from('admissions')
+      .select(`
+        *,
+        patients!inner(*),
+        rooms!inner(*),
+        nurse:medical_staff!nurse_id(*),
+        doctor:medical_staff!doctor_id(*)
+      `) // Added proper join selectors for related data
+      .lte('admission_date', now)
+      .or(`discharge_date.is.null,discharge_date.gt.${now}`)
+
+    if (doctorError || !data) {
+      return NextResponse.json(
+        { error: 'Failed to retrieve admission information' },
+        { status: 500 },
+      )
+    }
+
+    return NextResponse.json({ data }, { status: 200 }) // Changed to match other response formats
   } else if (role == 'Nurse') {
     // Fetch admissions for the logged-in nurse
     const { data: nurse, error: nurseError } = await supabase
