@@ -56,32 +56,42 @@ const RoomAvailabilityTable: React.FC = () => {
         if (!admissionsResponse.ok)
           throw new Error('Failed to fetch admissions')
         const admissionsData = await admissionsResponse.json()
-
+        
+        // Get current date (without time) for comparison
         const today = new Date()
-        today.setHours(0, 0, 0, 0) // Set to beginning of today
+        today.setHours(0, 0, 0, 0)
+        const now = today.toISOString()
+        
+        console.log("Fetched admissions data:", admissionsData)
 
-        const activeAdmissions = admissionsData.data
-          ? admissionsData.data.filter((admission: Admission) => {
-              const admissionDate = new Date(admission.admission_date)
-              const dischargeDate = admission.discharge_date
-                ? new Date(admission.discharge_date)
-                : null
+        // Process admissions data properly based on its structure
+        const admissions = admissionsData.data || []
+        console.log(`Processing ${admissions.length} admissions`)
 
-              // Consider active if today is between admission_date and discharge_date
-              return (
-                admissionDate <= today &&
-                (dischargeDate === null || dischargeDate >= today)
-              )
-            })
-          : []
-
+        // Calculate current occupancy by room - only count active admissions
         const admissionsByRoom: Record<string, number> = {}
-        activeAdmissions.forEach((admission: Admission) => {
-          if (admission.room_id) {
-            admissionsByRoom[admission.room_id] =
-              (admissionsByRoom[admission.room_id] || 0) + 1
+        
+        admissions.forEach((admission: Admission) => {
+          // Check if admission is active: admission date is in past or today AND (no discharge date OR discharge date is in future)
+          const admissionDate = new Date(admission.admission_date)
+          admissionDate.setHours(0, 0, 0, 0)
+          
+          const dischargeDate = admission.discharge_date 
+            ? new Date(admission.discharge_date) 
+            : null
+          if (dischargeDate) dischargeDate.setHours(0, 0, 0, 0)
+          
+          const isActive = 
+            admissionDate <= today && 
+            (!dischargeDate || dischargeDate >= today)
+            
+          if (isActive && admission.room_id) {
+            console.log(`Active admission in room ${admission.room_id}:`, admission)
+            admissionsByRoom[admission.room_id] = (admissionsByRoom[admission.room_id] || 0) + 1
           }
         })
+        
+        console.log("Current occupancy by room:", admissionsByRoom)
 
         const roomsWithAvailability = roomsData.map((room: Room) => {
           const currentOccupancy = admissionsByRoom[room.room_id] || 0
