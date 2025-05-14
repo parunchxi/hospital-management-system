@@ -8,6 +8,7 @@ import {
   User,
   Calendar,
   Hospital,
+  Clock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -88,6 +89,7 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
   const [rooms, setRooms] = useState<RoomInfo[]>([])
   const [nurses, setNurses] = useState<NurseInfo[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [refreshCounter, setRefreshCounter] = useState(0)
 
   // Form setup
   const form = useForm({
@@ -95,16 +97,30 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
       room_id: '',
       nurse_id: '',
       discharge_date: '',
+      discharge_time: '',
     },
   })
 
+  // Helper functions to extract date and time parts
+  const getDatePart = (isoString: string) => {
+    return isoString ? isoString.split('T')[0] : ''
+  }
+
+  const getTimePart = (isoString: string) => {
+    if (!isoString) return ''
+    const timePart = isoString.split('T')[1]
+    return timePart ? timePart.substring(0, 5) : '' // Get HH:MM part
+  }
+
+  // Fetch admission data
   useEffect(() => {
     if (!patientId) return
 
     setIsLoading(true)
     setError(null)
 
-    fetch(`/api/admission/${patientId}`)
+    // Add status=current parameter to only get current admissions
+    fetch(`/api/admission/${patientId}?status=current`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`)
@@ -115,8 +131,25 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
         console.log('Admission data received:', data)
         // API returns an array, take the first item if available
         const admissionData =
-          Array.isArray(data) && data.length > 0 ? data[0] : data
-        setAdmissionInfo(admissionData)
+          Array.isArray(data) && data.length > 0 ? data[0] : null
+
+        // Check if admission is current (not discharged and admission date is not in future)
+        if (admissionData) {
+          const now = new Date()
+          const admissionDate = new Date(admissionData.admission_date || '')
+          const isInFuture = admissionDate > now
+          const isDischargedStatus = admissionData.status === 'Discharged'
+
+          if (isInFuture || isDischargedStatus) {
+            // Admission is not current
+            setAdmissionInfo(null)
+          } else {
+            setAdmissionInfo(admissionData)
+          }
+        } else {
+          setAdmissionInfo(null)
+        }
+
         setIsLoading(false)
       })
       .catch((error) => {
@@ -124,35 +157,52 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
         setError('Failed to load admission details')
         setIsLoading(false)
       })
-  }, [patientId])
+  }, [patientId, refreshCounter])
 
+  // Fetch rooms and nurses when dialog opens
   useEffect(() => {
     if (!isDialogOpen) return
 
-    fetch('/api/rooms')
-      .then((res) => res.json())
-      .then((data) => setRooms(Array.isArray(data) ? data : []))
-    fetch('/api/staff?type=Nurse')
-      .then((res) => res.json())
-      .then((data) => setNurses(Array.isArray(data) ? data : []))
+    const fetchRoomsAndNurses = async () => {
+      try {
+        const [roomsResponse, nursesResponse] = await Promise.all([
+          fetch('/api/rooms'),
+          fetch('/api/staff?type=Nurse'),
+        ])
 
-    // Reset form with current admission info
-    if (admissionInfo) {
-      let nurseId = ''
-      if (admissionInfo.nurse && admissionInfo.nurse.user && nurses.length) {
-        const foundNurse = nurses.find(
-          (n) =>
-            n.users.first_name === admissionInfo.nurse?.user?.first_name &&
-            n.users.last_name === admissionInfo.nurse?.user?.last_name,
-        )
-        nurseId = foundNurse ? foundNurse.staff_id : ''
+        const roomsData = await roomsResponse.json()
+        const nursesData = await nursesResponse.json()
+
+        setRooms(Array.isArray(roomsData) ? roomsData : [])
+        setNurses(Array.isArray(nursesData) ? nursesData : [])
+      } catch (error) {
+        console.error('Error fetching rooms or nurses:', error)
       }
-      form.reset({
-        room_id: admissionInfo.room?.room_id || '',
-        nurse_id: nurseId,
-        discharge_date: admissionInfo.discharge_date || '',
-      })
     }
+
+    fetchRoomsAndNurses()
+  }, [isDialogOpen])
+
+  // Reset form when dialog opens or admission data changes
+  useEffect(() => {
+    if (!isDialogOpen || !admissionInfo) return
+
+    let nurseId = ''
+    if (admissionInfo.nurse?.user?.first_name && nurses.length) {
+      const foundNurse = nurses.find(
+        (n) =>
+          n.users.first_name === admissionInfo.nurse?.user?.first_name &&
+          n.users.last_name === admissionInfo.nurse?.user?.last_name,
+      )
+      nurseId = foundNurse ? foundNurse.staff_id : ''
+    }
+
+    form.reset({
+      room_id: admissionInfo.room?.room_id || '',
+      nurse_id: nurseId,
+      discharge_date: getDatePart(admissionInfo.discharge_date || ''),
+      discharge_time: getTimePart(admissionInfo.discharge_date || ''),
+    })
   }, [isDialogOpen, admissionInfo, nurses, form])
 
   // PATCH handler
@@ -160,28 +210,36 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
     if (!admissionInfo?.admission_id) return
     setIsSubmitting(true)
     try {
+      // Combine date and time for discharge_date
+      const dischargeDateTime = values.discharge_date
+        ? `${values.discharge_date}T${values.discharge_time || '00:00'}`
+        : null
+
       const res = await fetch(`/api/admission/${admissionInfo.admission_id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           room_id: values.room_id,
           nurse_id: values.nurse_id ? parseInt(values.nurse_id) : null,
-          discharge_date: values.discharge_date || null,
+          discharge_date: dischargeDateTime,
         }),
       })
       if (!res.ok) throw new Error('Failed to update admission')
-      toast.success('Admission updated successfully')
+
+      // If we're setting discharge date to today or earlier, this may change status to discharged
+      const dischargeDate = values.discharge_date
+        ? new Date(`${values.discharge_date}T${values.discharge_time || '00:00'}`)
+        : null
+      const now = new Date()
+      const isDischarging = dischargeDate && dischargeDate <= now
+
+      toast.success(
+        `Admission ${isDischarging ? 'discharged' : 'updated'} successfully`,
+      )
       setIsDialogOpen(false)
-      // Refresh admission info
-      setIsLoading(true)
-      fetch(`/api/admission/${patientId}`)
-        .then((res) => res.json())
-        .then((data) =>
-          setAdmissionInfo(
-            Array.isArray(data) && data.length > 0 ? data[0] : data,
-          ),
-        )
-        .finally(() => setIsLoading(false))
+
+      // Trigger a single refresh after successful update
+      setRefreshCounter((prev) => prev + 1)
     } catch (e: any) {
       toast.error(e.message || 'Error updating admission')
     } finally {
@@ -223,7 +281,7 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
         <CardHeader>
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <Heart className="h-4 w-4 text-muted-foreground" />
-            Admission Details
+            Current Admission
           </CardTitle>
 
           {/* Debug output - remove in production */}
@@ -350,6 +408,11 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
               <span className="text-muted-foreground text-sm">
                 Patient is not currently admitted
               </span>
+              {patientId && (
+                <span className="text-xs text-muted-foreground mt-1">
+                  No active admission found
+                </span>
+              )}
             </div>
           )}
         </CardContent>
@@ -434,22 +497,40 @@ const AdmissionDetails: React.FC<AdmissionDetailsProps> = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="discharge_date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 opacity-70" />
-                        Discharge Date
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="discharge_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 opacity-70" />
+                          Discharge Date
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="discharge_time"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 opacity-70" />
+                          Discharge Time
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <DialogFooter>
                   <Button
                     type="button"
