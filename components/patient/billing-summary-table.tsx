@@ -53,9 +53,11 @@ export default function BillingSummaryTable({ billing }: Props) {
     )
   }
 
-  const getStatusVariant = (status: 'Paid' | 'Pending') =>
+  const getStatusVariant = (status: 'Paid' | 'Pending' | 'Canceled') =>
     status === 'Paid'
       ? 'bg-[color:var(--color-green)] text-white'
+      : status === 'Canceled'
+      ? 'bg-[color:var(--color-red)] text-white'
       : 'bg-[color:var(--color-yellow)] text-white'
 
   // Format date function
