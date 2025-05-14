@@ -10,7 +10,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
-type Status = 'Pending' | 'Paid' | 'Cancelled'
+type Status = 'Pending' | 'Paid' | 'Canceled'
 
 export async function PATCH(
   req: NextRequest,
@@ -23,7 +23,7 @@ export async function PATCH(
   }
 
   const { status } = (await req.json().catch(() => ({}))) as { status?: Status }
-  if (!status || !['Pending', 'Paid', 'Cancelled'].includes(status)) {
+  if (!status || !['Pending', 'Paid', 'Canceled'].includes(status)) {
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
 
