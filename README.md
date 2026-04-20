@@ -15,7 +15,7 @@ A full-stack hospital management platform that centralizes patient records, staf
 | 👩‍⚕️ Staff Management | Roles, departments, and scheduling |
 | 🔐 Authentication | Secure email-based login via Supabase Auth |
 
-## 🚀 Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -26,6 +26,64 @@ A full-stack hospital management platform that centralizes patient records, staf
 | **Deployment** | [Vercel](https://vercel.com/) + Supabase Hosting |
 | **Forms** | React Hook Form + Zod |
 | **Charts** | Recharts |
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TB
+    subgraph Clients["👤 User Roles"]
+        direction LR
+        A1[🛡️ Admin]
+        A2[👨‍⚕️ Doctor]
+        A3[👩‍⚕️ Nurse]
+        A4[💊 Pharmacist]
+        A5[🧑‍⚕️ Patient]
+    end
+
+    subgraph Frontend["🖥️ Frontend — Next.js + Tailwind CSS + ShadCN UI"]
+        direction TB
+        F1[Admin Dashboard]
+        F2[Doctor Portal]
+        F3[Nurse Portal]
+        F4[Pharmacy Portal]
+        F5[Patient Portal]
+        F6[Auth Pages\nLogin · Register · Reset]
+    end
+
+    subgraph Middleware["🔒 Middleware — Supabase Auth"]
+        M1[Session Validation\n& Role-Based Routing]
+    end
+
+    subgraph Backend["⚙️ Backend — Next.js Server Actions / API Routes"]
+        B1[Appointment Logic]
+        B2[Patient Records]
+        B3[Pharmacy & Stock]
+        B4[Room & Bed Management]
+        B5[Staff & Scheduling]
+    end
+
+    subgraph Database["🗄️ Supabase — PostgreSQL"]
+        D1[(Users & Auth)]
+        D2[(Medical Records)]
+        D3[(Appointments)]
+        D4[(Pharmacy & Inventory)]
+        D5[(Rooms & Beds)]
+    end
+
+    subgraph Deployment["☁️ Deployment"]
+        V1[Vercel\nFrontend + API]
+        S1[Supabase\nDB + Auth + Storage]
+    end
+
+    Clients -->|HTTPS Request| Middleware
+    Middleware -->|Authorized Session| Frontend
+    Frontend -->|Server Actions / Fetch| Backend
+    Backend -->|SQL Queries| Database
+
+    V1 -.->|Hosts| Frontend
+    V1 -.->|Hosts| Backend
+    S1 -.->|Hosts| Database
+```
 
 ## 📁 Project Structure
 
@@ -46,7 +104,7 @@ hospital-management-system/
 └── .env.example        # Environment variable template
 ```
 
-## ⚙️ Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
